@@ -1,22 +1,22 @@
-@import url(https://fonts.googleapis.com/css2?family=Jersey+25+Charted&display=swap);
+@import url(https://fonts.google.com/specimen/Jersey+25+Charted);
 body {
- font-family: var(--paragraph-fond);
+ font-family: var(--paragraph-font);
  max-width: 960px;
  padding: 20px;
 }
 :root {
-    --primary-color: #xxxxxx;
-    --secondary-color: #xxxxxx;
-    --accent1-color: #xxxxxx;
-    --accent2-color: #xxxxxx;
+    --primary-color: #e6902e;
+    --secondary-color: #9bc232;
+    --accent1-color: #42b133;
+    --accent2-color: #409ea5;
 
-    --heading-font: sans-serif, serif;
-    --paragraph-font: sans-serif, serif;
+    --heading-font: 'Jersey 25 Charted', sans-serif, serif;
+    --paragraph-font: 'Jersey 25 Charted', sans-serif, serif;
 
-    --nav-backround-color: #xxxxxx;
-    --nav-link-color: #xxxxxx;
-    --nav-hover-link-color: #xxxxxx;
-    --nav-hover-backround-color: #xxxx;
+    --nav-backround-color: #3ea6aa;
+    --nav-link-color: #3138a5;
+    --nav-hover-link-color: #962683;
+    --nav-hover-backround-color: #532626;
 }
 
 h1, h2, h3, h4, h5, h6 {
