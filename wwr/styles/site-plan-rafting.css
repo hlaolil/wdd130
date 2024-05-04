@@ -5,10 +5,10 @@ body {
  padding: 20px;
 }
 :root {
-    --primary-color: #e6902e;
+    --primary-color: #a2535371;
     --secondary-color: #9bc232;
     --accent1-color: #42b133;
-    --accent2-color: #409ea5;
+    --accent2-color: #1c1e1f;
 
     --heading-font: 'Jersey 25 Charted', sans-serif, serif;
     --paragraph-font: 'Jery 25 Charted', sans-serif, serif;
