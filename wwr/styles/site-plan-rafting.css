@@ -1,4 +1,4 @@
-@import url(https://fonts.google.com/specimen/Jersey+25+Charted);
+@import url(https://fonts.googleapis.com/css2?family=Jersey+25+Charted&display=swap);
 body {
  font-family: var(--paragraph-font);
  max-width: 960px;
