@@ -1,23 +1,24 @@
-@import url(https://fonts.googleapis.com/css2?family=Jersey+25+Charted&display=swap);
+@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Rock+Salt&display=swap');
 body {
  font-family: var(--paragraph-font);
  max-width: 960px;
  padding: 20px;
 }
 :root {
-    --primary-color: #a2535371;
-    --secondary-color: #9bc232;
-    --accent1-color: #42b133;
-    --accent2-color: #1c1e1f;
+    --primary-color: #C6C7C4;
+    --secondary-color: #A2999E;
+    --accent1-color: #846A6A;
+    --accent2-color: #353B3C;
 
-    --heading-font: 'Jersey 25 Charted', sans-serif, serif;
-    --paragraph-font: 'Jersey 25 Charted', sans-serif, serif;
+    --heading-font: 'Jersey 25 Charted', sans-serif;
+    --paragraph-font: 'Jersey 25 Charted', sans-serif;
 
     --nav-background-color: #641f1f;
     --nav-link-color: #3138a5;
     --nav-hover-link-color: #962683;
-    --nav-hover-backround-color: #8f3939;
+    --nav-hover-background-color: #8f3939;
 }
+
 
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--heading-font);
