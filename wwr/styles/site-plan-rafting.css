@@ -1,17 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Rock+Salt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto&display=swap');
+
 body {
- font-family: var(--paragraph-font);
- max-width: 960px;
- padding: 20px;
+    font-family: var(--paragraph-font);
+    max-width: 960px;
+    padding: 20px;
 }
+
 :root {
     --primary-color: #C6C7C4;
     --secondary-color: #A2999E;
     --accent1-color: #846A6A;
     --accent2-color: #353B3C;
 
-    --heading-font: 'Rock Salt', sans-serif;
-    --paragraph-font: 'Rock Salt', sans-serif;
+    --heading-font: 'Bebas Neue', sans-serif;
+    --paragraph-font: 'Roboto', sans-serif;
 
     --nav-background-color: #641f1f;
     --nav-link-color: #3138a5;
@@ -19,15 +21,16 @@ body {
     --nav-hover-background-color: #8f3939;
 }
 
-
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--heading-font);
     color: var(--primary-color);
 }
+
 header {
     padding: 20px;
     background-color: var(--accent1-color);
 }
+
 p {
     padding: 25px;
 }
@@ -36,20 +39,21 @@ nav {
     background-color: var(--nav-background-color);
     font-size: 1.2rem;
     display: flex;
-  }
-  
-  nav a {
+}
+
+nav a {
     display: block;
     color: var(--nav-link-color);
     text-decoration: none;
     padding: 1rem;
-  }
-  
-  nav a:link, nav a:visited {
+}
+
+nav a:link,
+nav a:visited {
     color: var(--nav-link-color);
-  }
-  
-  nav a:hover {
+}
+
+nav a:hover {
     color: var(--nav-hover-link-color);
     background-color: var(--nav-hover-background-color);
-  }
+}
