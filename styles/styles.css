@@ -18,10 +18,12 @@ main img {
     box-shadow: 0 0 30px gray;
 }
 p {
+    max-width: 40em;
     padding: 0;
 }
 main {
     max-width: 840px;
+    position: relative;
 }
 aside {
     width: 20rem;
@@ -40,4 +42,51 @@ footer {
     margin-top: 15px;
     border-top: 1px solid #000;
     text-align: center;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Class Selectors */
+
+.box {
+    position: relative;
+    margin: 1rem;
+    border: 1px solid rgba(0,0,0,.1);
+    padding: 1rem;
+    background-color: #e5a0a0;
+    color: #180d08;
+  }
+  
+  aside {
+    width: 20em;
+    text-align: center;
+  }
+     
+main img {
+    /* you most likely will have other declarations here */
+    float: right;
+    margin: 10px;
+    overflow: hidden;
+  }
+  
+aside h2 {
+    position: relative;
+    top: 24px;
+    left: 16px;
+}
+ul {
+    max-width: 20em;
+}
+.profilecont {
+    margin: 20px;
+    max-width: 40;
+}
+
+.profilecont img {
+    margin-left: 20px; /* Add some margin to separate the image from the text */
+    float: right;
 }
