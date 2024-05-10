@@ -82,7 +82,7 @@ ul {
 }
 .profilecont {
     margin: 20px;
-    max-width: auto;
+    max-width: 40em;
 }
 
 .profilecont img {
