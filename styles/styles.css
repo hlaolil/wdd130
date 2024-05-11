@@ -9,6 +9,7 @@ nav a {
 }
 h1 {
     color: steelblue;
+    margin: 2rem;
 }
 main img {
     width: 150px;
@@ -27,7 +28,7 @@ main {
 }
 aside {
     width: 20rem;
-    margin: 1rem;
+    margin: 2rem;
     border: 1px solid rgba(0,0,0,0.2); /* 1 */
     padding: 1rem;
     background-color: #eee;
@@ -54,7 +55,7 @@ footer {
 
 .box {
     position: relative;
-    margin: 1rem;
+    margin: 2rem;
     border: 1px solid rgba(0,0,0,.1);
     padding: 1rem;
     background-color: #e5a0a0;
@@ -74,14 +75,14 @@ main img {
   
 aside h2 {
     position: absolute;
-    top: 24px;
-    left: 16px;
+    top: 15px;
+    left: 125px;
 }
 ul {
     max-width: 20em;
 }
 .profilecont {
-    margin: 20px;
+    margin: 2rem;
     max-width: 40em;
 }
 
