@@ -38,3 +38,32 @@ a {
     width: 100%;
     height: auto;
   }
+h1 {
+    position: absolute;
+}
+
+article {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8); /* Adjust opacity as needed */
+    padding: 20px;
+    top: 80%; /* Adjust positioning */
+    left: 50%; /* Adjust positioning */
+    transform: translate(-50%, -50%); /* Center the article */
+    width: 75%;
+}
+
+article img {
+    float: right;
+    margin-left: 20px; /* Add margin to create space between image and text */
+    width: 200px !important
+    
+}
+
+.hero h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Assuming you want white text on top of the image */
+    font-size: 2em; /* Adjust the font size as needed */
+}
