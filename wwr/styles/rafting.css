@@ -54,7 +54,7 @@ article {
 
 article img {
     float: right;
-    margin-left: 20px; /* Add margin to create space between image and text */
+    margin-left: 20px; 
     width: 200px !important
     
 }
@@ -64,6 +64,6 @@ article img {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white; /* Assuming you want white text on top of the image */
-    font-size: 2em; /* Adjust the font size as needed */
+    color: white; 
+    font-size: 2em; 
 }
