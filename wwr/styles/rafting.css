@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+:root {
+    --primary-color: #C6C7C4;
+    --secondary-color: #A2999E;
+    --accent1-color: #846A6A;
+    --accent2-color: #353B3C;
+
+    --heading-font: 'Bebas Neue', sans-serif;
+    --paragraph-font: 'Roboto', sans-serif;
+
+    --nav-background-color: #641f1f;
+    --nav-link-color: #3138a5;
+    --nav-hover-link-color: #962683;
+    --nav-hover-background-color: #8f3939;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    color: var(--primary-color);
+}
+
+header {
+    padding: 20px;
+    background-color: var(--accent1-color);
+}
+
+p {
+    padding: 25px;
+}
+
+a {
+    text-decoration: none;
+  }
+
+.hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
