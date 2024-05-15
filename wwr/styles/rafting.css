@@ -37,6 +37,8 @@ a {
     display: block;
     width: 100%;
     height: auto;
+
+    
   }
 h1 {
     position: absolute;
@@ -50,6 +52,7 @@ article {
     left: 50%; /* Adjust positioning */
     transform: translate(-50%, -50%); /* Center the article */
     width: 75%;
+ 
 }
 
 article img {
@@ -66,4 +69,7 @@ article img {
     transform: translate(-50%, -50%);
     color: white; 
     font-size: 2em; 
+}
+.hero {
+    position: relative;
 }
