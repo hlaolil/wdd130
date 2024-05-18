@@ -17,7 +17,8 @@ nav a {
 h1 {
     color: steelblue;
     margin: 2rem;
-    border-bottom: steelblue;
+    border-bottom: 1px solid steelblue;
+    padding-bottom: 10px;
 }
 main img {
     width: 150px;
@@ -95,6 +96,7 @@ aside h2 {
 header, .grid, footer {
     max-width: 840px;
     margin: 0 auto;
+    align-self: center;
 }
 
 .grid {
