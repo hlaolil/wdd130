@@ -41,6 +41,7 @@ aside {
     background-color: #eee;
     color: #333;
     text-align: center;
+    position: relative;
 }
 aside img {
     width: 200px;
@@ -103,6 +104,7 @@ header, .grid, footer {
   }
 
 .grid {
-    display: flex;
-    grid-template-columns: 100px 200px 1fr;
+    display: grid;
+    align-items: center;
+    grid-template-columns: 2fr 1fr;;
   }
