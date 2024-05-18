@@ -1,15 +1,23 @@
 nav {
 background-color: steelblue;
-padding: 10px;
+padding: 1rem;
+display: flex;
+justify-content: space-evenly;
+align-items: center;
 }
+
 nav a {
     color: white;
     display: block;
-    padding: 20px;
+    padding: 0.5rem;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 h1 {
     color: steelblue;
     margin: 2rem;
+    border-bottom: steelblue;
 }
 main img {
     width: 150px;
@@ -23,7 +31,6 @@ p {
     padding: 0;
 }
 main {
-    max-width: 840px;
     position: relative;
 }
 aside {
@@ -75,12 +82,11 @@ main img {
   
 aside h2 {
     position: absolute;
-    top: 15px;
-    left: 125px;
+    top: 10px;
+    left: 100px;
+    color: #000;
 }
-ul {
-    max-width: 20em;
-}
+
 .profilecont {
     margin: 2rem;
     max-width: 40em;
@@ -90,3 +96,13 @@ ul {
     margin-left: 20px; 
     float: right;
 }
+
+header, .grid, footer {
+    max-width: 840px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: flex;
+    grid-template-columns: 100px 200px 1fr;
+  }
