@@ -157,7 +157,7 @@ footer p {
 
 .adventure-grid {
     display: grid;
-    grid-column: 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 20px; /* Adjust the gap between items as needed */
 }
 
