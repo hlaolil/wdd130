@@ -94,7 +94,7 @@ aside h2 {
 }
 
 header, .grid, footer {
-    max-width: 840px;
+    max-width: 500px;
     margin: 0 auto;
     align-self: center;
 }

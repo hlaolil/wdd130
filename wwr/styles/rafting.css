@@ -5,71 +5,123 @@
     --secondary-color: #A2999E;
     --accent1-color: #846A6A;
     --accent2-color: #353B3C;
-
+    
     --heading-font: 'Bebas Neue', sans-serif;
     --paragraph-font: 'Roboto', sans-serif;
-
+    
     --nav-background-color: #641f1f;
     --nav-link-color: #3138a5;
     --nav-hover-link-color: #962683;
     --nav-hover-background-color: #8f3939;
 }
 
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--heading-font);
     color: var(--primary-color);
 }
 
+/* Header */
 header {
     padding: 20px;
     background-color: var(--accent1-color);
+    margin: 1rem auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    max-width: 1500px;
 }
 
+.logo img {
+    margin: 0 0.25rem 0 1rem;
+    width: 64px;
+    height: auto;
+}
+
+/* Paragraphs */
 p {
     padding: 25px;
+    font-family: var(--paragraph-font);
+    color: var(--secondary-color);
 }
 
+/* Links */
 a {
     text-decoration: none;
-  }
+    color: var(--nav-link-color);
+}
 
+/* Hero Section */
 .hero img {
     display: block;
     width: 100%;
-    height: auto;
-
-    
-  }
-h1 {
-    position: absolute;
+    height: 100%; /* Make the image cover the container height */
+    object-fit: cover; /* Ensures the image covers the container without distortion */
 }
 
-article {
-    position: absolute;
-    background-color: rgba(255, 255, 255, 0.8); /* Adjust opacity as needed */
-    padding: 20px;
-    top: 80%; /* Adjust positioning */
-    left: 50%; /* Adjust positioning */
-    transform: translate(-50%, -50%); /* Center the article */
-    width: 75%;
- 
-}
-
-article img {
-    float: right;
-    margin-left: 20px; 
-    width: 200px !important
-    
+.hero {
+    position: relative;
+    height: 400px; /* Set the desired height */
+    overflow: hidden; /* Ensure excess image is not visible */
 }
 
 .hero h1 {
     position: absolute;
-    top: 50%;
+    top: 25%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: white; 
-    font-size: 2em; 
+    color: white;
+    font-size: 2em;
+    font-family: var(--heading-font);
 }
-.hero {
-    position: relative;
+
+
+
+/* Article */
+article {
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    top: 70%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75%;
+}
+
+article img {
+    float: right;
+    margin-left: 20px;
+    width: 200px !important;
+}
+
+/* Navigation */
+nav {
+    text-align: right;
+    background-color: var(--nav-background-color);
+}
+
+.navigation {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navigation li {
+    flex: 1;
+}
+
+.navigation a {
+    display: block;
+    color: var(--nav-link-color);
+    padding: 20px;
+    transition: font-weight 0.3s, text-decoration 0.3s;
+}
+
+.navigation a:hover {
+    font-weight: 700;
+    text-decoration: underline;
+    color: var(--nav-hover-link-color);
+    background-color: var(--nav-hover-background-color);
 }
