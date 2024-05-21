@@ -125,3 +125,45 @@ nav {
     color: var(--nav-hover-link-color);
     background-color: var(--nav-hover-background-color);
 }
+/* Footer */
+footer {
+    background-color: var(--accent2-color);
+    padding: 20px 0;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+footer p {
+    font-family: var(--paragraph-font);
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.sociallinks a {
+    margin-left: 10px;
+}
+
+.sociallinks img {
+    width: 24px;
+    height: 24px;
+}
+
+.adventure-grid {
+    display: grid;
+    grid-column: 1fr 1fr;
+    gap: 20px; /* Adjust the gap between items as needed */
+}
+
+figcaption {
+    margin-top: 8px; /* Adjust spacing between image and caption */
+    font-size: 0.9em; /* Adjust font size for captions */
+    color: #555; /* Adjust color for captions */
+}
+
