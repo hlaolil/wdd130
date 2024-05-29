@@ -12,19 +12,15 @@
 </head>
 <body>
     <header>
-        <div class="headercontent">
             <img src="images/logo.jpg" alt="logo">
-            <div>
-                <nav>
-                    <ul class="navigation">
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="trips.html">Trips</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                    </ul>    
-                </nav>
-            </div>
-        </div>
+            <nav>
+                <ul class="navigation">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="trips.html">Trips</a></li>
+                    <li><a href="contact.html">Contact Us</a></li>
+                </ul>    
+            </nav>
     </header>
     <main>
         <div class="hero">
@@ -34,10 +30,8 @@
             <h1>Contact Us</h1>
             <p>We love questions and feedback and we're always happy to help! Here are some ways to contact us.</p>
         </div>
-        <div class="contact-msg">
-            <h1>Contact Us</h1>
-            <p>We love questions and feedback and we're always happy to help! Here are some ways to contact us.</p>
-        </div>
+
+        <!-- Contact Form Section -->
         <div>
             <form>
                 <fieldset>
@@ -50,16 +44,33 @@
                         <input type="email" id="useremail" name="useremail">
                     </div>
                     <div class="form-item column1">
-                        <label for="Telephone">Telephone:</label>
-                        <input type="tel" id="Telephone" name="Telephone">
+                        <label for="telephone">Telephone:</label>
+                        <input type="tel" id="telephone" name="telephone">
                     </div>
                     <div class="form-item column2">
                         <label for="organisation">Organisation:</label>
                         <input type="text" id="organisation" name="organisation">
                     </div>
+                    <label for="purpose">Purpose:</label>
+                    <div>
+                        <input type="radio" id="general" name="purpose" value="general" required>
+                        <label for="general">General Inquiry</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="reservation" name="purpose" value="reservation">
+                        <label for="reservation">Reservation Question</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="suggestion" name="purpose" value="suggestion">
+                        <label for="suggestion">Website Suggestion</label>
+                    </div>
                     <div class="form-item text message">
                         <label for="message">Message:</label>
                         <textarea id="message" name="message"></textarea>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="subscribe" name="subscribe">
+                        <label for="subscribe">Please subscribe me to the monthly newsletter</label>
                     </div>
                 </fieldset>
                 <div class="form-item">
@@ -67,6 +78,25 @@
                 </div>
             </form>
         </div>
+
+        <!-- Employee Profiles Section -->
+        <section class="employee-profiles">
+            <h2>Meet Our Team</h2>
+            <div class="profile">
+                <img src="images/employee1.jpg" alt="John Doe">
+                <figcaption>John Doe - Lead Guide</figcaption>
+            </div>
+            <div class="profile">
+                <img src="images/employee2.jpg" alt="Jane Smith">
+                <figcaption>Jane Smith - Safety Officer</figcaption>
+            </div>
+            <div class="profile">
+                <img src="images/employee3.jpg" alt="Mike Brown">
+                <figcaption>Mike Brown - Tour Manager</figcaption>
+            </div>
+        </section>
+
+        <!-- Contact Information Section -->
         <div class="contact-info">
             <h2>Contact Information</h2>
             <p>A1 Road Behind BEDCO Opposite Usave<br>
@@ -74,8 +104,8 @@
                 tlokza@gmail.com<br>
                 +26656176099
             </p>
-            <div>
-                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d27979.511910356618!2d28.23851907030214!3d-28.766162473295765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sls!4v1716920400126!5m2!1sen!2sls" width="600" height="450" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div id="map">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d27979.511910356618!2d28.23851907030214!3d-28.766162473295765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sls!4v1716920400126!5m2!1sen!2sls" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </main>
@@ -95,6 +125,5 @@
             </nav>
         </div>
     </footer>
-    
 </body>
 </html>

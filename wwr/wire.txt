@@ -1,33 +1,39 @@
------------------------------------------------------
-| [Logo Image]| Home | About Us | Trips | Contact Us|
-|---------------------------------------------------|
-|                    [Hero Image]                   |
-|              (Reduced-width banner image)         |
------------------------------------------------------
-|                  Contact Us                       |
-|---------------------------------------------------|
-|  We love questions and feedback and we're always  |
-|  happy to help! Here are some ways to contact us. |
------------------------------------------------------
-|                   Contact Form                    |
-|---------------------------------------------------|
-|  Full Name:     [___________________________]     |
-|  Email:         [___________________________]     |
-|  Telephone:     [___________________________]     |
-|  Organisation:  [___________________________]     |
-|  Message:       [___________________________]     |
-|                 [___________________________]     |
-|                 [___________________________]     |
-|                             [ Submit Button ]     |
------------------------------------------------------
-|                Contact Information                |
-|---------------------------------------------------|
-|  A1 Road Behind BEDCO Opposite Usave              |
-|  Butha-Buthe 400 Lesotho                          |
-|  tlokza@gmail.com                                 |
-|  +26656176099                                     |
------------------------------------------------------
-|       Footer   [Facebook]  [Twitter]  [Instagram] |
------------------------------------------------------
-
-
+-------------------------------------------------------------------------------------
+|                                       Header                                      |
+|-----------------------------------------------------------------------------------|
+| [Logo]                     | Home | About Us | Trips | Contact Us                 |
+-------------------------------------------------------------------------------------
+|                                      Main Content                                 |
+|-----------------------------------------------------------------------------------|
+| [Hero Image]                                                                      |
+|-----------------------------------------------------------------------------------|
+| Contact Us                                                                        |
+| We love questions and feedback and we're always happy to help! Here are some ways |
+| to contact us.                                                                    |
+|-----------------------------------------------------------------------------------|
+| [Contact Form]                                                                    |
+| - Full Name: [Input]                                                              |
+| - Email: [Input]                                                                  |
+| - Telephone: [Input]                                                              |
+| - Organisation: [Input]                                                           |
+| - Purpose: [Radio Buttons]                                                        |
+| - Message: [Textarea]                                                             |
+| - Subscribe to Newsletter: [Checkbox]                                             |
+| - [Submit Button]                                                                 |
+|-----------------------------------------------------------------------------------|
+| Meet Our Team                                                                     |
+| [Employee Image 1] John Doe - Lead Guide   [Employee Image 2] Jane Smith - Safety |
+| Officer                      [Employee Image 3] Mike Brown - Tour Manager         |
+|-----------------------------------------------------------------------------------|
+| Contact Information                                                               |
+| A1 Road Behind BEDCO Opposite Usave                                               |
+| Butha-Buthe 400 Lesotho                                                           |
+| tlokza@gmail.com                                                                  |
+| +26656176099                                                                      |
+| [Google Map Embed]                                                                |
+-------------------------------------------------------------------------------------
+|                                       Footer                                      |
+|-----------------------------------------------------------------------------------|
+|&copy; 2024 ✨ Joyce White-Water Rafting ✨ Letlotlo Hlaoli ✨ [Link to Wireframe] 
+| [Facebook Icon] [Twitter Icon] [Instagram Icon]                                   |
+-------------------------------------------------------------------------------------

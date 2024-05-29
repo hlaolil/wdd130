@@ -26,17 +26,12 @@ header {
     padding: 20px;
     background-color: var(--accent1-color);
     margin: 1rem auto;
-    display: flex;
+    display: grid;
+				grid-template-columns: 1fr 1fr;
     justify-content: space-around;
     align-items: center;
     border-bottom: 1px solid #ccc;
     max-width: 100%;
-}
-.headercontent {
-display: grid;
-grid-template-columns: 1fr 1fr;
-justify-content: space-between;
-
 }
 
 .logo img {
@@ -46,10 +41,15 @@ justify-content: space-between;
 }
 
 /* Paragraphs */
-p {
-    padding: 25px;
+p, footer p {
     font-family: var(--paragraph-font);
     color: var(--secondary-color);
+    padding: 25px;
+    margin: 0;
+}
+
+footer p {
+    color: #f8f1f1;
 }
 
 /* Links */
@@ -59,17 +59,17 @@ a {
 }
 
 /* Hero Section */
+.hero {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
 .hero img {
     display: block;
     width: 100%;
-    height: 100%; /* Make the image cover the container height */
-    object-fit: cover; /* Ensures the image covers the container without distortion */
-}
-
-.hero {
-    position: relative;
-    height: 200px; /* Set the desired height */
-    overflow: hidden; /* Ensure excess image is not visible */
+    height: 100%;
+    object-fit: cover;
 }
 
 .hero h1 {
@@ -81,8 +81,6 @@ a {
     font-size: 2em;
     font-family: var(--heading-font);
 }
-
-
 
 /* Article */
 article {
@@ -131,6 +129,7 @@ nav {
     color: var(--nav-hover-link-color);
     background-color: var(--nav-hover-background-color);
 }
+
 /* Footer */
 footer {
     background-color: var(--accent2-color);
@@ -146,12 +145,6 @@ footer {
     padding: 0 20px;
 }
 
-footer p {
-    font-family: var(--paragraph-font);
-    color: #f8f1f1;
-    margin: 0;
-}
-
 .sociallinks a {
     margin-left: 10px;
 }
@@ -164,14 +157,15 @@ footer p {
 .adventure-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px; /* Adjust the gap between items as needed */
+    gap: 20px;
 }
 
 figcaption {
-    margin-top: 8px; /* Adjust spacing between image and caption */
-    font-size: 0.9em; /* Adjust font size for captions */
-    color: #555; /* Adjust color for captions */
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #555;
 }
+
 .contact-msg h1 {
     font-size: 2em;
     margin-bottom: 10px;
@@ -182,7 +176,7 @@ figcaption {
 }
 
 /* Form Styles */
-form {
+form, .contact-info {
     background-color: #fff;
     padding: 20px;
     border-radius: 5px;
@@ -222,16 +216,6 @@ fieldset {
     resize: vertical;
 }
 
-/* Contact Information */
-.contact-info {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    max-width: 600px;
-    margin: 20px auto;
-}
-
 .contact-info h2 {
     font-size: 1.5em;
     margin-bottom: 10px;
@@ -240,6 +224,7 @@ fieldset {
 .contact-info p {
     line-height: 1.6;
 }
+
 .form-item button {
     padding: 10px 20px;
     border: none;
@@ -253,4 +238,33 @@ fieldset {
 
 .form-item button:hover {
     background-color: #0056b3;
+}
+
+#map iframe {
+    width: 100%;
+    height: 450px;
+    border: 0;
+}
+
+/* Employee Profiles Section */
+.employee-profiles {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.profile {
+    text-align: center;
+}
+
+.profile img {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+}
+
+/* Checkbox and Radio Buttons */
+.contact-form input[type="checkbox"], 
+.contact-form input[type="radio"] {
+    margin-right: 5px;
 }
