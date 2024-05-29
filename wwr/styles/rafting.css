@@ -77,7 +77,7 @@ a {
     top: 25%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: rgb(61, 57, 57);
+    color: rgb(61, 57, 57) !important;
     font-size: 2em;
     font-family: var(--heading-font);
 }
