@@ -51,31 +51,32 @@
                         <label for="organisation">Organisation:</label>
                         <input type="text" id="organisation" name="organisation">
                     </div>
-                    <label for="purpose">Purpose:</label>
-                    <div>
-                        <input type="radio" id="general" name="purpose" value="general" required>
-                        <label for="general">General Inquiry</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="reservation" name="purpose" value="reservation">
-                        <label for="reservation">Reservation Question</label>
-                    </div>
-                    <div>
-                        <input type="radio" id="suggestion" name="purpose" value="suggestion">
-                        <label for="suggestion">Website Suggestion</label>
-                    </div>
-                    <div class="form-item text message">
-                        <label for="message">Message:</label>
-                        <textarea id="message" name="message"></textarea>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="subscribe" name="subscribe">
-                        <label for="subscribe">Please subscribe me to the monthly newsletter</label>
+                        <label>Purpose:</label>
+                        <div>
+                            <input type="radio" id="general" name="purpose" value="general" required>
+                            <label for="general">General Inquiry</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="support" name="purpose" value="support">
+                            <label for="support">Support</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="feedback" name="purpose" value="feedback">
+                            <label for="feedback">Feedback</label>
+                        </div>
+                        <div class="form-item text message">
+                            <label for="message">Message:</label>
+                            <textarea id="message" name="message"></textarea>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="subscribe" name="subscribe">
+                            <label for="subscribe">Please subscribe me to the monthly newsletter</label>
+                        </div>
+                        <div class="form-item">
+                            <button type="submit">Submit</button>
+                        </div>
                     </div>
                 </fieldset>
-                <div class="form-item">
-                    <button type="submit">Submit</button>
-                </div>
             </form>
         </div>
 
@@ -83,16 +84,22 @@
         <section class="employee-profiles">
             <h2>Meet Our Team</h2>
             <div class="profile">
-                <img src="images/employee1.jpg" alt="John Doe">
-                <figcaption>Joyce Hlaoli - Lead Guide</figcaption>
+                <figure>
+                    <img src="images/employee1.jpg" alt="John Doe">
+                    <figcaption>Joyce Hlaoli - Lead Guide</figcaption>
+                </figure>
             </div>
             <div class="profile">
-                <img src="images/employee2.jpg" alt="Jane Smith">
-                <figcaption>Agnes Morero - Safety Officer</figcaption>
+                <figure>
+                    <img src="images/employee2.jpg" alt="Jane Smith">
+                    <figcaption>Agnes Morero - Safety Officer</figcaption>
+                </figure>
             </div>
             <div class="profile">
-                <img src="images/employee3.jpg" alt="Mike Brown">
-                <figcaption>Annah Tae - Tour Manager</figcaption>
+                <figure>
+                    <img src="images/employee3.jpg" alt="Mike Brown">
+                    <figcaption>Annah Tae - Tour Manager</figcaption>
+                </figure>
             </div>
         </section>
 
