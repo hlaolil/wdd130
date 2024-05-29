@@ -61,7 +61,7 @@ a {
 /* Hero Section */
 .hero {
     position: relative;
-    height: 200px;
+    height: 400px;
     overflow: hidden;
 }
 
@@ -96,7 +96,7 @@ article {
 article img {
     float: right;
     margin-left: 20px;
-    width: 400px !important;
+    width: 200px !important;
 }
 
 /* Navigation */
