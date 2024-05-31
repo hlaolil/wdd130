@@ -1,12 +1,12 @@
 * {
-    margin: 0;
+    margin: 1rem;
     padding: 0;
     box-sizing: border-box;
 }
 
 body, html {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 75%;
 }
 
 header, .grid, footer {
@@ -94,6 +94,7 @@ footer {
     padding: 1rem;
     background-color: #e5a0a0;
     color: #180d08;
+    width: 100%;
 }
 
 aside h2 {
