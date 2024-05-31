@@ -1,9 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+}
+
+header, .grid, footer {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    align-self: center;
+}
+
 nav {
-background-color: steelblue;
-padding: 1rem;
-display: flex;
-justify-content: space-evenly;
-align-items: center;
+    background-color: steelblue;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
 }
 
 nav a {
@@ -14,12 +32,14 @@ nav a {
     font-size: 1.2rem;
     font-weight: 700;
 }
+
 h1 {
     color: steelblue;
     margin: 2rem;
     border-bottom: 1px solid steelblue;
     padding-bottom: 10px;
 }
+
 main img {
     width: 150px;
     height: auto;
@@ -30,41 +50,41 @@ main img {
     margin: 10px;
     overflow: hidden;
 }
+
 p {
-    max-width: 40em;
+    max-width: 100%;
     padding: 0;
 }
+
 main {
     position: relative;
     grid-column: 2/3;
     margin: 1rem;
 }
+
 aside {
-    width: 15rem;
+    width: 100%;
+    max-width: 15rem;
     margin: 2rem;
-    border: 1px solid rgba(0,0,0,0.2); /* 1 */
+    border: 1px solid rgba(0,0,0,0.2);
     padding: 1rem;
     background-color: #eee;
     color: #333;
     text-align: center;
     grid-column: 1/2;
     grid-row: 1/2;
-
 }
+
 aside img {
-    width: 200px;
+    width: 100%;
+    max-width: 200px;
     height: auto;
 }
+
 footer {
     margin-top: 15px;
     border-top: 1px solid #000;
     text-align: center;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
 }
 
 .box {
@@ -74,8 +94,8 @@ footer {
     padding: 1rem;
     background-color: #e5a0a0;
     color: #180d08;
-  }
-  
+}
+
 aside h2 {
     position: absolute;
     top: 10px;
@@ -85,7 +105,7 @@ aside h2 {
 
 .profilecont {
     margin: 2rem;
-    max-width: 40em;
+    max-width: 100%;
 }
 
 .profilecont img {
@@ -93,13 +113,8 @@ aside h2 {
     float: right;
 }
 
-header, .grid, footer {
-    max-width: 500px;
-    margin: 0 auto;
-    align-self: center;
-}
-
 .grid {
     display: grid;
     align-items: center;
+    width: 100%;
 }
