@@ -383,3 +383,95 @@ main {
 .trip-table tr:hover {
     background-color: #f1f1f1;
 }
+/* Newsletter Section */
+.newsletter {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.newsletter h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.newsletter form {
+    display: inline-block;
+}
+
+.newsletter label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.newsletter input[type="text"],
+.newsletter input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.newsletter button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+/* Call to Action Section */
+.call-to-action {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.call-to-action h2 {
+    margin-bottom: 20px;
+    font-size: 1.8em;
+}
+
+.call-to-action p {
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.call-to-action .btn {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.call-to-action .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Grid Layout Section */
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.grid-item {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.grid-item img {
+    width: 100%;
+    border-radius: 5px;
+}
+
+.grid-item h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+}
+
+.grid-item p {
+    font-size: 1.2em;
+}

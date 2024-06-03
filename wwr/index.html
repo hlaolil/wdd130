@@ -3,9 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Joyce Rafting Site</title>
+    <link rel="stylesheet" href="styles/rafting.css">
 </head>
 <body>
-    
+    <header>
+        <img src="images/logo.jpg" alt="Joyce Rafting Logo" width="100">
+        <nav>
+            <ul class="navigation">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="trips.html">Trips</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+            </ul>    
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <img src="images/hero.jpg" alt="Rafting Adventure" width="100%">
+            <h1>Welcome to Joyce White-Water Rafting</h1>
+        </section>
+
+        <section class="newsletter">
+            <h2>Sign up for our newsletter</h2>
+            <form action="#" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" placeholder="Your name" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Your email" required>
+                <button type="submit">Sign Up</button>
+            </form>
+        </section>
+
+        <section class="call-to-action">
+            <h2>Ready for an adventure?</h2>
+            <p>Explore our thrilling rafting trips!</p>
+            <a href="trips.html" class="btn">View Trips</a>
+        </section>
+
+        <section class="grid-layout">
+            <div class="grid-item">
+                <img src="images/rafting1.jpeg" alt="Rafting Adventure 1" width="100%">
+                <h3>Exciting Rapids Adventure</h3>
+                <p>Experience the thrill of Class IV rapids with our Exciting Rapids Adventure. Perfect for adrenaline junkies looking for a challenge.</p>
+            </div>
+            <div class="grid-item">
+                <img src="images/rafting2.jpeg" alt="Rafting Adventure 2" width="100%">
+                <h3>Family Fun Float</h3>
+                <p>Enjoy a relaxing float down the river with the whole family. Our Family Fun Float is suitable for all ages and skill levels.</p>
+            </div>
+            <div class="grid-item">
+                <img src="images/rafting3.jpeg" alt="Rafting Adventure 3" width="100%">
+                <h3>Sunset River Cruise</h3>
+                <p>Witness the beauty of the sunset while cruising down the river. Our Sunset River Cruise is a serene and picturesque experience.</p>
+            </div>
+            <div class="grid-item">
+                <img src="images/rafting4.jpeg" alt="Rafting Adventure 4" width="100%">
+                <h3>Adventure Day Trip</h3>
+                <p>Spend the whole day on the river with our Adventure Day Trip. Ideal for those looking to make the most out of their rafting experience.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 Joyce White-Water Rafting | Designed by Letlotlo Hlaoli</p>
+            <a href="images/homepage-wireframe.jpg">View Home Page Wireframe</a>
+        </div>
+    </footer>
 </body>
 </html>
