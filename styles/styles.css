@@ -118,4 +118,5 @@ aside h2 {
     display: grid;
     align-items: center;
     width: 100%;
+    grid-template-columns: 1fr;
 }
