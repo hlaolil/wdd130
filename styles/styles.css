@@ -113,3 +113,10 @@ aside h2 {
     margin-left: 20px; 
     float: right;
 }
+
+/* Grid container */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns of equal width */
+    gap: 20px; /* Space between grid items */
+    padding: 20px; /* Padding around the grid */
