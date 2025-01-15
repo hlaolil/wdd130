@@ -113,10 +113,3 @@ aside h2 {
     margin-left: 20px; 
     float: right;
 }
-
-.grid {
-    display: grid;
-    align-items: center;
-    width: 100%;
-    grid-template-columns: 1fr;
-}
