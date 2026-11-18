@@ -167,7 +167,7 @@ $('form').addEventListener('submit', async e => {
       log(`Added ${added} of ${todo.length}…`);
     }
     $('bar').value = $('bar').max;
-    log(`Done: ${added} added${failed ? `, ${failed} failed` : ''}${skipped ? `, ${skipped} already there` : ''}. Open Zotero to see the new folders.`, 'ok');
+    log(`Done: ${added} added${failed ? `, ${failed} failed` : ''}${skipped ? `, ${skipped} already there` : ''}. Open Zotero to see the new folders. Next: add summaries and covers on zotero-enrich.html.`, 'ok');
     $('key').value = '';
   } catch (err) {
     log(`Stopped: ${err.message}`, 'err');

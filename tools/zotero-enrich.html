@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Add summaries and covers in Zotero</title>
+  <style>
+    :root { --navy: #0f2a44; --green: #2f7d5b; --line: #e3ddd2; --muted: #5b6673; --red: #b3261e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #fbf9f5; color: #1d2733; line-height: 1.5; }
+    header { background: var(--navy); color: #fff; padding: 1.4rem 1.2rem; }
+    header h1 { margin: 0; font-family: Georgia, serif; font-size: 1.5rem; }
+    header p { margin: .4rem 0 0; color: #cfdbe6; }
+    main { max-width: 640px; margin: 0 auto; padding: 1.2rem; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: .8rem; }
+    input[type=password] { display: block; width: 100%; margin-top: .3rem; padding: .7rem; font: inherit; border: 1px solid #cfc8bb; border-radius: 8px; }
+    .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+    .check input { margin-top: .3rem; width: 1.1rem; height: 1.1rem; }
+    .hint { font-weight: 400; color: var(--muted); font-size: .9rem; }
+    button { width: 100%; padding: .9rem; font: inherit; font-weight: 600; color: #fff; background: var(--green); border: 0; border-radius: 999px; cursor: pointer; }
+    button.stop { background: #fff; color: var(--red); border: 1px solid var(--red); margin-top: .6rem; }
+    button:disabled { background: #9bb5a8; }
+    progress { width: 100%; height: 14px; }
+    #summary { font-weight: 600; margin: .5rem 0; }
+    #log { font-size: .88rem; margin: .4rem 0 0; max-height: 22rem; overflow: auto; }
+    #log div { padding: .15rem 0; border-bottom: 1px solid #f1ece3; }
+    .ok { color: var(--green); } .err { color: var(--red); } .dim { color: var(--muted); }
+    #log img { height: 44px; vertical-align: middle; margin-right: .4rem; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Add summaries and covers in Zotero</h1>
+    <p>Fills in each reading's summary (Abstract) and cover picture from published sources.</p>
+  </header>
+  <main>
+    <div class="card">
+      <strong>How it works</strong>
+      <p class="hint" style="margin:.3rem 0 0">For each book it looks up the publisher's description and cover on Google Books and Open Library; for journal articles it takes the published abstract from OpenAlex. A match is used only when the title and author agree. The summary goes into Zotero's <b>Abstract</b> field (its source is noted in <b>Extra</b>), and the cover link and ISBN are saved so BookHub can show the picture. Items that already have a summary keep it. You can stop and run it again later; it carries on where it left off.</p>
+    </div>
+
+    <form id="form" class="card">
+      <label>Zotero API key (with write access)
+        <input id="key" type="password" autocomplete="off" required placeholder="Paste your key">
+      </label>
+      <label class="check"><input type="checkbox" id="lists" checked>
+        <span>My imported reading lists<br><span class="hint">PhD coursework and bi-vocational ministry folders</span></span>
+      </label>
+      <label class="check"><input type="checkbox" id="others">
+        <span>Also the other books in my library<br><span class="hint">Books outside those folders that have no summary or cover yet</span></span>
+      </label>
+      <button id="go" type="submit">Add summaries and covers</button>
+      <button id="stop" type="button" class="stop" hidden>Stop</button>
+    </form>
+
+    <div class="card" id="progress-card" hidden>
+      <progress id="bar" value="0" max="1"></progress>
+      <div id="summary"></div>
+      <div id="log"></div>
+    </div>
+  </main>
+
+<script>
+const ZOT = 'https://api.zotero.org';
+const LISTS = ['PhD coursework reading lists', 'Bi-vocational ministry reading list'];
+const $ = id => document.getElementById(id);
+let stopping = false;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/^(the|a|an)\s+/, '').split(/[:.(?]/)[0].replace(/[^a-z0-9]+/g, ' ').trim();
+const strip = s => String(s || '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n').replace(/<[^>]+>/g, '')
+  .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/\n{3,}/g, '\n\n').trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+function log(html, cls = '') {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  if (cls) d.className = cls;
+  $('log').prepend(d);
+}
+
+// ---------- Zotero ----------
+async function zot(path, key, opts = {}) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const res = await fetch(ZOT + path, {
+      ...opts,
+      headers: { 'Zotero-API-Key': key, 'Zotero-API-Version': '3', ...(opts.body ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) },
+    });
+    const wait = Number(res.headers.get('Backoff') || res.headers.get('Retry-After') || 0);
+    if (res.status === 429 || res.status === 503) { await sleep((wait || 5) * 1000); continue; }
+    if (wait) await sleep(wait * 1000);
+    if (!res.ok && res.status !== 412) throw new Error(`Zotero ${res.status}: ${await res.text()}`);
+    return res.status === 204 || res.status === 412 ? { status: res.status } : { status: res.status, json: await res.json() };
+  }
+  throw new Error('Zotero is busy. Try again in a few minutes.');
+}
+
+async function zotAll(path, key) {
+  const out = [];
+  for (let start = 0; ; start += 100) {
+    const { json } = await zot(`${path}${path.includes('?') ? '&' : '?'}limit=100&start=${start}`, key);
+    out.push(...json);
+    if (json.length < 100) return out;
+  }
+}
+
+// ---------- outside sources ----------
+async function getJson(url) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(url);
+      if (res.status === 429) { await sleep(4000 * (attempt + 1)); continue; }
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      await sleep(1500);
+    }
+  }
+  return null;
+}
+
+const titleMatches = (want, got) => {
+  const a = norm(want), b = norm(got);
+  return !!a && !!b && (a === b || a.startsWith(b + ' ') || b.startsWith(a + ' ') || (a.length > 12 && b.startsWith(a)) || (b.length > 12 && a.startsWith(b)));
+};
+const authorMatches = (lasts, names) => !lasts.length || (names || []).some(n => lasts.some(l => norm(n).includes(norm(l))));
+
+async function fromGoogle(title, lasts) {
+  const q = `intitle:${title.split(':')[0]}${lasts[0] ? ` inauthor:${lasts[0]}` : ''}`;
+  const d = await getJson(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=10&printType=books`);
+  const hits = (d?.items || []).map(v => v.volumeInfo).filter(v => titleMatches(title, v.title + (v.subtitle ? `: ${v.subtitle}` : '')) && authorMatches(lasts, v.authors));
+  if (!hits.length) return null;
+  const best = hits.find(v => v.description) || hits[0];
+  const isbn = (best.industryIdentifiers || []).find(i => i.type === 'ISBN_13')?.identifier || (best.industryIdentifiers || []).find(i => i.type === 'ISBN_10')?.identifier || '';
+  const img = hits.map(v => v.imageLinks?.thumbnail).find(Boolean);
+  return {
+    summary: strip(best.description),
+    isbn,
+    cover: img ? img.replace('http://', 'https://').replace('&edge=curl', '') : '',
+    source: 'Google Books',
+  };
+}
+
+async function fromOpenLibrary(title, lasts) {
+  const d = await getJson(`https://openlibrary.org/search.json?title=${encodeURIComponent(title.split(':')[0])}${lasts[0] ? `&author=${encodeURIComponent(lasts[0])}` : ''}&limit=5&fields=key,title,subtitle,author_name,cover_i,isbn`);
+  const doc = (d?.docs || []).find(x => titleMatches(title, x.title + (x.subtitle ? `: ${x.subtitle}` : '')) && authorMatches(lasts, x.author_name));
+  if (!doc) return null;
+  const work = await getJson(`https://openlibrary.org${doc.key}.json`);
+  const desc = typeof work?.description === 'string' ? work.description : work?.description?.value || '';
+  return {
+    summary: strip(desc).replace(/\(\[source\]\[\d+\]\)[\s\S]*$/, '').replace(/-{3,}[\s\S]*$/, '').trim(),
+    isbn: (doc.isbn || []).find(i => i.length === 13) || '',
+    cover: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg` : '',
+    source: 'Open Library',
+  };
+}
+
+function rebuildAbstract(index) {
+  if (!index) return '';
+  const words = [];
+  for (const [w, pos] of Object.entries(index)) for (const p of pos) words[p] = w;
+  return words.filter(Boolean).join(' ');
+}
+
+async function fromOpenAlex(item, lasts) {
+  let w = null;
+  if (item.DOI) w = await getJson(`https://api.openalex.org/works/doi:${encodeURIComponent(item.DOI)}`);
+  if (!w) {
+    const d = await getJson(`https://api.openalex.org/works?search=${encodeURIComponent(item.title)}&per-page=5`);
+    w = (d?.results || []).find(r => titleMatches(item.title, r.display_name) && authorMatches(lasts, (r.authorships || []).map(a => a.author?.display_name)));
+  }
+  if (!w) return null;
+  return { summary: rebuildAbstract(w.abstract_inverted_index), isbn: '', cover: '', source: 'OpenAlex' };
+}
+
+async function lookUp(item) {
+  const lasts = (item.creators || []).map(c => c.lastName || c.name || '').filter(Boolean).slice(0, 2);
+  if (item.itemType === 'journalArticle') return fromOpenAlex(item, lasts);
+  if (!['book', 'report', 'thesis'].includes(item.itemType)) return null;
+  const g = await fromGoogle(item.title, lasts);
+  await sleep(250);
+  let o = null;
+  if (!g || !g.summary || !g.cover) {
+    o = await fromOpenLibrary(item.title, lasts);
+    await sleep(250);
+  }
+  if (!g && !o) return null;
+  return {
+    summary: g?.summary || o?.summary || '',
+    source: g?.summary ? 'Google Books' : o?.summary ? 'Open Library' : '',
+    isbn: g?.isbn || o?.isbn || '',
+    cover: o?.cover || g?.cover || '',
+  };
+}
+
+// ---------- run ----------
+$('stop').addEventListener('click', () => {
+  stopping = true;
+  $('stop').disabled = true;
+  $('stop').textContent = 'Stopping after this item…';
+});
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const key = $('key').value.trim();
+  if (!key || (!$('lists').checked && !$('others').checked)) return;
+  stopping = false;
+  $('go').disabled = true;
+  $('stop').hidden = false;
+  $('stop').disabled = false;
+  $('stop').textContent = 'Stop';
+  $('progress-card').hidden = false;
+  $('log').textContent = '';
+  const counts = { summary: 0, cover: 0, none: 0, failed: 0 };
+  const show = (done, total) => {
+    $('summary').textContent = `${done} of ${total} checked · ${counts.summary} summaries · ${counts.cover} covers · ${counts.none} not found${counts.failed ? ` · ${counts.failed} errors` : ''}`;
+  };
+  try {
+    const { json: k } = await zot('/keys/current', key);
+    const user = k.userID;
+    if (!k.access?.user?.write) throw new Error('This key cannot write to your library. Make a key with "Allow write access" ticked.');
+    log('Key OK. Gathering your items…', 'dim');
+
+    const byKey = new Map();
+    if ($('lists').checked) {
+      const cols = await zotAll(`/users/${user}/collections?format=json`, key);
+      const parents = cols.filter(c => LISTS.includes(c.data.name)).map(c => c.key);
+      const subs = cols.filter(c => parents.includes(c.data.parentCollection) || parents.includes(c.key)).map(c => c.key);
+      if (!subs.length) log('No imported reading-list folders found. Run the import page first.', 'err');
+      for (const ck of subs) for (const it of await zotAll(`/users/${user}/collections/${ck}/items/top?format=json`, key)) byKey.set(it.key, it);
+    }
+    if ($('others').checked) {
+      for (const it of await zotAll(`/users/${user}/items/top?format=json&itemType=book`, key)) byKey.set(it.key, it);
+    }
+
+    const isBook = it => ['book', 'report', 'thesis'].includes(it.data.itemType);
+    const needs = it => !it.data.abstractNote || (isBook(it) && !/^Cover:/m.test(it.data.extra || ''));
+    const todo = [...byKey.values()].filter(it => needs(it) && !/^Enrich: checked/m.test(it.data.extra || ''));
+    log(`${byKey.size} items, ${todo.length} still need a summary or cover.`, 'dim');
+    $('bar').max = todo.length || 1;
+    show(0, todo.length);
+
+    for (let i = 0; i < todo.length && !stopping; i++) {
+      const it = todo[i];
+      const d = it.data;
+      try {
+        const found = await lookUp(d);
+        const patch = {};
+        const extra = (d.extra || '').split('\n').filter(Boolean);
+        if (found?.summary && !d.abstractNote) {
+          patch.abstractNote = found.summary;
+          extra.push(`Summary source: ${found.source}`);
+          counts.summary++;
+        }
+        if (found?.cover && !/^Cover:/m.test(d.extra || '')) {
+          extra.push(`Cover: ${found.cover}`);
+          counts.cover++;
+        }
+        if (found?.isbn && 'ISBN' in d && !d.ISBN) patch.ISBN = found.isbn;
+        if (!patch.abstractNote && !found?.cover) counts.none++;
+        extra.push('Enrich: checked');
+        patch.extra = extra.join('\n');
+        const res = await zot(`/users/${user}/items/${it.key}`, key, {
+          method: 'PATCH',
+          body: JSON.stringify(patch),
+          headers: { 'If-Unmodified-Since-Version': String(it.version) },
+        });
+        if (res.status === 412) throw new Error('changed in Zotero meanwhile; it will be retried next run');
+        const pic = found?.cover ? `<img src="${esc(found.cover)}" alt="">` : '';
+        const what = [patch.abstractNote ? 'summary' : '', found?.cover ? 'cover' : ''].filter(Boolean).join(' + ') || 'nothing found';
+        log(`${pic}<b>${esc(d.title)}</b> — ${what}${found?.source && patch.abstractNote ? ` (${found.source})` : ''}`, what === 'nothing found' ? 'dim' : '');
+      } catch (err) {
+        counts.failed++;
+        log(`<b>${esc(d.title)}</b> — ${esc(err.message)}`, 'err');
+      }
+      $('bar').value = i + 1;
+      show(i + 1, todo.length);
+    }
+    log(stopping ? 'Stopped. Run it again any time to carry on.' : 'Done. In BookHub, press “Refresh from Zotero” to see the covers.', 'ok');
+    $('key').value = stopping ? $('key').value : '';
+  } catch (err) {
+    log(`Stopped: ${esc(err.message)}`, 'err');
+  } finally {
+    $('go').disabled = false;
+    $('stop').hidden = true;
+  }
+});
+</script>
+</body>
+</html>
