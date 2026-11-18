@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Import reading lists into Zotero</title>
+  <style>
+    :root { --navy: #0f2a44; --green: #2f7d5b; --line: #e3ddd2; --muted: #5b6673; --red: #b3261e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #fbf9f5; color: #1d2733; line-height: 1.5; }
+    header { background: var(--navy); color: #fff; padding: 1.4rem 1.2rem; }
+    header h1 { margin: 0; font-family: Georgia, serif; font-size: 1.5rem; }
+    header p { margin: .4rem 0 0; color: #cfdbe6; }
+    main { max-width: 640px; margin: 0 auto; padding: 1.2rem; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: .8rem; }
+    input[type=text], input[type=password] { display: block; width: 100%; margin-top: .3rem; padding: .7rem; font: inherit; border: 1px solid #cfc8bb; border-radius: 8px; }
+    .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+    .check input { margin-top: .3rem; width: 1.1rem; height: 1.1rem; }
+    .hint { font-weight: 400; color: var(--muted); font-size: .9rem; }
+    button { width: 100%; padding: .9rem; font: inherit; font-weight: 600; color: #fff; background: var(--green); border: 0; border-radius: 999px; cursor: pointer; }
+    button:disabled { background: #9bb5a8; }
+    progress { width: 100%; height: 14px; }
+    #log { font-size: .9rem; white-space: pre-wrap; margin: .6rem 0 0; max-height: 18rem; overflow: auto; }
+    .ok { color: var(--green); } .err { color: var(--red); }
+    ol { padding-left: 1.2rem; margin: .3rem 0 0; }
+    a { color: var(--green); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Import my reading lists into Zotero</h1>
+    <p>Adds the PhD coursework lists and the bi-vocational reading list to my Zotero library.</p>
+  </header>
+  <main>
+    <div class="card">
+      <strong>First, get a Zotero key that can write</strong>
+      <ol>
+        <li>Open <a href="https://www.zotero.org/settings/keys/new" target="_blank" rel="noopener">zotero.org/settings/keys/new</a> and sign in.</li>
+        <li>Name it “Reading list import”, tick <b>Allow library access</b> and <b>Allow write access</b>, then <b>Save Key</b>.</li>
+        <li>Copy the key and paste it below. It is used only on this page and is never saved.</li>
+      </ol>
+    </div>
+
+    <form id="form" class="card">
+      <label>Zotero API key
+        <input id="key" type="password" autocomplete="off" required placeholder="Paste your key">
+      </label>
+      <label class="check"><input type="checkbox" id="cw" checked>
+        <span>PhD coursework reading lists <span class="hint" id="cw-n"></span><br><span class="hint">One sub-folder per course, tagged by course and required/recommended</span></span>
+      </label>
+      <label class="check"><input type="checkbox" id="bv" checked>
+        <span>Bi-vocational ministry reading list <span class="hint" id="bv-n"></span><br><span class="hint">One sub-folder per area</span></span>
+      </label>
+      <p class="hint">Books already in your library (same title) are skipped, so it is safe to run this again.</p>
+      <button id="go" type="submit">Import into Zotero</button>
+    </form>
+
+    <div class="card" id="progress-card" hidden>
+      <progress id="bar" value="0" max="1"></progress>
+      <div id="log"></div>
+    </div>
+  </main>
+
+<script>
+const API = 'https://api.zotero.org';
+const $ = id => document.getElementById(id);
+let data;
+
+const log = (msg, cls = '') => {
+  const line = document.createElement('div');
+  line.textContent = msg;
+  if (cls) line.className = cls;
+  $('log').appendChild(line);
+  $('log').scrollTop = 1e9;
+};
+const norm = s => String(s || '').toLowerCase().replace(/^(the|a|an)\s+/, '').split(/[:.(]/)[0].replace(/[^a-z0-9]+/g, ' ').trim();
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+
+async function api(path, key, opts = {}) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const res = await fetch(API + path, {
+      ...opts,
+      headers: { 'Zotero-API-Key': key, 'Zotero-API-Version': '3', ...(opts.body ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) },
+    });
+    const wait = Number(res.headers.get('Backoff') || res.headers.get('Retry-After') || 0);
+    if (res.status === 429 || res.status === 503) { await sleep((wait || 5) * 1000); continue; }
+    if (wait) await sleep(wait * 1000);
+    if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+    return { json: res.status === 204 ? null : await res.json(), headers: res.headers };
+  }
+  throw new Error('Zotero is busy. Please try again in a few minutes.');
+}
+
+async function getAll(path, key) {
+  const out = [];
+  for (let start = 0; ; start += 100) {
+    const { json } = await api(`${path}${path.includes('?') ? '&' : '?'}limit=100&start=${start}`, key);
+    out.push(...json);
+    if (json.length < 100) return out;
+  }
+}
+
+async function ensureCollection(user, key, name, parent, existing) {
+  const found = existing.find(c => c.data.name === name && (c.data.parentCollection || false) === (parent || false));
+  if (found) return found.key;
+  const body = [{ name, ...(parent ? { parentCollection: parent } : {}) }];
+  const { json } = await api(`/users/${user}/collections`, key, { method: 'POST', body: JSON.stringify(body), headers: { 'Zotero-Write-Token': token() } });
+  const made = (json.successful || {})['0'];
+  if (!made) throw new Error(`Could not create folder "${name}": ${JSON.stringify(json.failed)}`);
+  existing.push(made);
+  return made.key;
+}
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const key = $('key').value.trim();
+  const lists = ['coursework', 'bivocational'].filter(l => $(l === 'coursework' ? 'cw' : 'bv').checked);
+  if (!key || !lists.length) return;
+  $('go').disabled = true;
+  $('progress-card').hidden = false;
+  $('log').textContent = '';
+  try {
+    log('Checking the key…');
+    const { json: k } = await api('/keys/current', key);
+    const user = k.userID;
+    if (!k.access?.user?.write) throw new Error('This key cannot write to your library. Make a new key with "Allow write access" ticked.');
+    log(`Key OK for ${k.username || 'user ' + user}.`, 'ok');
+
+    log('Reading what is already in your library…');
+    const have = new Set((await getAll(`/users/${user}/items/top?format=json`, key)).map(i => norm(i.data.title)));
+    log(`${have.size} items already in your library.`);
+
+    const cols = await getAll(`/users/${user}/collections?format=json`, key);
+    const merged = new Map(); // one Zotero item per work, even if it is in both lists
+    for (const list of lists) {
+      const L = data[list];
+      log(`Preparing folder “${L.collection}”…`);
+      const parent = await ensureCollection(user, key, L.collection, null, cols);
+      const subKeys = {};
+      for (const s of L.subcollections) subKeys[s] = await ensureCollection(user, key, s, parent, cols);
+      for (const { item, sub } of L.items) {
+        const id = norm(item.title) + '|' + (item.date || '');
+        const m = merged.get(id) || { ...item, collections: [], tags: [] };
+        m.collections = [...new Set([...m.collections, ...sub.map(s => subKeys[s])])];
+        m.tags = [...new Map([...m.tags, ...(item.tags || [])].map(t => [t.tag, t])).values()];
+        merged.set(id, m);
+      }
+    }
+    const todo = [...merged.values()].filter(it => !have.has(norm(it.title)));
+    const skipped = merged.size - todo.length;
+    log(`${todo.length} to add${skipped ? `, ${skipped} skipped (already in your library)` : ''}.`);
+    $('bar').max = todo.length || 1;
+
+    let added = 0, failed = 0;
+    for (let i = 0; i < todo.length; i += 50) {
+      const batch = todo.slice(i, i + 50);
+      const { json } = await api(`/users/${user}/items`, key, { method: 'POST', body: JSON.stringify(batch), headers: { 'Zotero-Write-Token': token() } });
+      added += Object.keys(json.successful || {}).length;
+      for (const [idx, f] of Object.entries(json.failed || {})) {
+        failed++;
+        log(`Not added: “${batch[idx].title}” (${f.message})`, 'err');
+      }
+      $('bar').value = Math.min(i + 50, todo.length);
+      log(`Added ${added} of ${todo.length}…`);
+    }
+    $('bar').value = $('bar').max;
+    log(`Done: ${added} added${failed ? `, ${failed} failed` : ''}${skipped ? `, ${skipped} already there` : ''}. Open Zotero to see the new folders.`, 'ok');
+    $('key').value = '';
+  } catch (err) {
+    log(`Stopped: ${err.message}`, 'err');
+  } finally {
+    $('go').disabled = false;
+  }
+});
+
+fetch('zotero-items.json')
+  .then(r => r.json())
+  .then(d => {
+    data = d;
+    $('cw-n').textContent = `(${d.coursework.items.length} readings)`;
+    $('bv-n').textContent = `(${d.bivocational.items.length} works)`;
+  });
+</script>
+</body>
+</html>
