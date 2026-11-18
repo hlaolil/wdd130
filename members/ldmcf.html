@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membership Form</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="members.css">
+</head>
+<body data-org="ldmcf">
+  <header class="band">
+    <a class="back" href="../">← Letlotlo Hlaoli</a>
+    <p class="eyebrow">Membership form</p>
+    <h1 id="org-name"></h1>
+  </header>
+
+  <main>
+    <div id="thanks" class="card thanks" hidden>
+      <h2>Thank you!</h2>
+      <p>Your membership details have been received.</p>
+    </div>
+
+    <form id="member-form" class="card" novalidate>
+      <p class="note">Fields marked <span class="req">*</span> are required.</p>
+
+      <fieldset>
+        <legend>Personal details</legend>
+        <div class="row two">
+          <label>Name <span class="req">*</span><input name="first-name" required maxlength="120" autocomplete="given-name"></label>
+          <label>Surname <span class="req">*</span><input name="last-name" required maxlength="120" autocomplete="family-name"></label>
+        </div>
+        <div class="row">
+          <span class="label">Gender <span class="req">*</span></span>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="gender" value="Male" required> Male</label>
+            <label class="choice"><input type="radio" name="gender" value="Female"> Female</label>
+          </div>
+        </div>
+        <div class="row two">
+          <label>Date of birth <span class="req">*</span><input id="date-of-birth" type="date" name="date-of-birth" required autocomplete="bday"></label>
+          <label>Marital status
+            <select name="marital-status">
+              <option value="">Select…</option>
+              <option>Single</option><option>Married</option><option>Widowed</option><option>Divorced</option>
+            </select>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Contact &amp; address</legend>
+        <div class="row two">
+          <label>Contact number <span class="req">*</span><input type="tel" name="phone" required maxlength="40" autocomplete="tel" placeholder="+266 5000 0000"></label>
+          <label>Email<input type="email" name="email" maxlength="200" autocomplete="email" placeholder="you@example.com"></label>
+        </div>
+        <div class="row three">
+          <label>Village <span class="req">*</span><input name="village" required maxlength="120"></label>
+          <label>City / Town <span class="req">*</span><input name="city" required maxlength="120" autocomplete="address-level2"></label>
+          <label>Country<input name="country" maxlength="120" value="Lesotho" autocomplete="country-name"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Spiritual journey</legend>
+        <div class="row two">
+          <label>Year saved <span class="req">*</span><input type="number" name="year-saved" required min="1900" placeholder="e.g. 2015"></label>
+          <div>
+            <span class="label">Water baptism <span class="req">*</span></span>
+            <div class="choices">
+              <label class="choice"><input type="radio" name="water-baptism" value="yes" required> Yes</label>
+              <label class="choice"><input type="radio" name="water-baptism" value="no"> No</label>
+            </div>
+          </div>
+        </div>
+        <div class="row two" id="baptism-year-row" hidden>
+          <label>Year baptised<input type="number" name="baptism-year" min="1900" placeholder="e.g. 2016"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Next of kin / emergency contact</legend>
+        <div class="row two">
+          <label>Full name<input name="emergency-name" maxlength="120"></label>
+          <label>Contact number<input type="tel" name="emergency-phone" maxlength="40"></label>
+        </div>
+      </fieldset>
+
+      <label class="consent"><input type="checkbox" name="consent" value="yes" required> <span id="consent-text"></span> <span class="req">*</span></label>
+
+      <!-- Spam trap: hidden from people -->
+      <label class="trap" aria-hidden="true">Leave this empty <input name="website" tabindex="-1" autocomplete="off"></label>
+
+      <p id="form-msg" class="msg" role="status"></p>
+      <button type="submit" class="btn">Submit membership form</button>
+    </form>
+  </main>
+
+  <script src="form.js"></script>
+</body>
+</html>
