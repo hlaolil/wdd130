@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BookHub: My Zotero Books</title>
+    <script type="module" crossorigin src="./assets/index-6tJ_LGJ6.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BWg-oXxs.css">
+  </head>
+  <body>
+    <header>
+        <h1>BookHub: My Zotero Books</h1>
+        <p style="margin:.3rem 0 0"><a href="../" style="color:inherit">← Back to Letlotlo Hlaoli</a></p>
+    </header>
+    <div class="container">
+      <input
+        type="text"
+        id="search"
+        placeholder="Search books by title or author..."
+      />
+      <div id="books" class="books-grid"></div>
+      <div id="loading" class="hidden">Loading...</div>
+      <div id="error" class="hidden"></div>
+      <div id="summaryModal" class="modal hidden">
+        <div class="modal-content" tabindex="0">
+          <h2 id="modalTitle"></h2>
+          <p id="modalSummary"></p>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <p>© 2025 BookHub. All rights reserved.</p>
+    </footer>
+  </body>
+</html>
