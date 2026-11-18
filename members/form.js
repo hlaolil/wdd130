@@ -12,7 +12,7 @@ const ORGS = {
   },
   ldmcf: {
     short: 'LDMCF',
-    name: 'LDMCF',
+    name: 'Letšeng Diamonds Mine Christian Fellowship',
   },
 };
 
