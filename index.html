@@ -1,47 +1,180 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Letlotlo Hlaoli | WDD 130</title>
-    <meta name="description" content="Welcome to Letlotlo Hlaoli's dedicated page for the Fundamentals of Web Development course! This platform is designed to provide a hands-on environment for practicing the essential skills covered in class. Whether you're delving into HTML, CSS, JavaScript, or exploring the principles of web design and development, this space offers a wealth of resources, exercises, and projects to hone your abilities. Dive into coding challenges, explore real-world case studies, and collaborate with peers to strengthen your understanding of web development fundamentals. Join Letlotlo Hlaoli on this journey to master the building blocks of the digital world">
-    <meta name="author" content="Letlotlo Hlaoli">
-    <link rel="stylesheet" href="styles/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Letlotlo Hlaoli | Pharmacist · Minister · Developer</title>
+  <meta name="description" content="Letlotlo Hlaoli — pharmacist, Assemblies of God minister, PhD researcher and software developer from Butha-Buthe, Lesotho.">
+  <meta name="author" content="Letlotlo Hlaoli">
+  <meta property="og:title" content="Letlotlo Hlaoli">
+  <meta property="og:description" content="Pharmacist, minister, PhD researcher and software developer from Lesotho.">
+  <meta property="og:image" content="images/profile.webp">
+  <meta name="theme-color" content="#0f2a44">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230f2a44'/><text x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Georgia,serif' font-size='30' fill='%23f4efe6'>LH</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/site.css">
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="#">Home</a>
-            <a href="wwr/">Rafting Website</a>
-            <a href="wwr/site-plan-rafting.html">Rafting Site Plan</a>
-            <a href="https://www.linkedin.com/in/letlotlo-hlaoli-98541237/">Linkedin</a>
-            <a href="https://web.facebook.com/Tlokza">Facebook</a>
-        </nav>
-    </header>
-   
-        <main>
-            <div class="grid">
-                <aside class="box">
-                    <h2>Lesotho</h2>
-                    <img src="images/Lesotho.jpg" alt="Lesotho Landscape">
-                    <p>Lesotho is a mountaneous country in Southern Africa completely surrounded by the Republic of South Africa. The capital and largest city of Lesotho is Maseru. The culture of Lesotho is rich and diverse, with a significant influence from the Sotho people who make up the majority of the population. The country's economy relies heavily on agriculture, textiles, and remittances from Basotho working in South Africa.</p>
-                </aside>
-                <div class="profilecont">
-                    <h1>Letlotlo Hlaoli | WDD 130</h1>
-                    <img src="images/profile.webp" alt="Letlotlo Hlaoli" width="200">
-                    <p>Hello, my name is Letlotlo Hlaoli, a pharmacist with a fervent interest in integrating computer science into the realm of healthcare. Originally from Lesotho, I embarked on a journey in pharmaceutical science, earning a Bachelor of Pharmacy degree from the National University of Lesotho. My career path led me through various roles, including pharmacist at Letseng Diamonds Naleli Medi-Clinic and management consultant at Grace Pharmacy Pty Ltd. In these capacities, I developed expertise in inventory management, budgeting, and strategic planning, always striving for operational excellence. However, my passion for innovation and my recognition of technology's potential to transform healthcare prompted me to pursue a degree in Computer Science at Brigham Young University-Idaho.</p>     
-                </div>
-                <ul class="box">
-                    <li><a href="https://www.churchofjesuschrist.org/temples/details/durban-south-africa-temple?lang=eng" target="_blank">Durban South Africa Temple</a></li>
-                    <li><a href="https://www.churchofjesuschrist.org/temples/details/johannesburg-south-africa-temple?lang=eng" target="_blank">Johannesburg South Africa Temple</a></li>
-                    <li><a href="https://www.churchofjesuschrist.org/temples/details/aba-nigeria-temple?lang=eng" target="_blank">Aba Nigeria Temple</a></li>
-                </ul>
-            </div> 
-        </main>
-         
-    <footer>
-        <p>&copy;2024 ✨ Letlotlo Hlaoli ✨ Butha-Buthe, Lesotho</p>
-    </footer>
+  <header class="topbar">
+    <a class="brand" href="#top">Letlotlo Hlaoli</a>
+    <button class="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="Open menu">☰</button>
+    <nav id="nav">
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#projects">Projects</a>
+      <a href="#education">Education</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-inner">
+        <div class="hero-text">
+          <p class="eyebrow">Butha-Buthe, Lesotho</p>
+          <h1>Letlotlo Hlaoli</h1>
+          <p class="roles">Pharmacist <span>·</span> Minister <span>·</span> Researcher <span>·</span> Developer</p>
+          <p class="lead">I care for patients, pastor a growing church, research how the church can plant and sustain congregations in Lesotho, and build software that makes this work easier.</p>
+          <div class="cta">
+            <a class="btn" href="#projects">See my projects</a>
+            <a class="btn ghost" href="#contact">Get in touch</a>
+          </div>
+        </div>
+        <figure class="portrait">
+          <img src="images/profile.webp" alt="Letlotlo Hlaoli" width="300" height="450">
+        </figure>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <h2>About me</h2>
+      <div class="about">
+        <div>
+          <p>I was born in Leribe in northern Lesotho and grew up in Butha-Buthe. I trained as a pharmacist at the National University of Lesotho and have worked in pharmacy since 2013 — in retail, in a mining clinic, and as a director of two community pharmacies.</p>
+          <p>Alongside pharmacy I serve in the Assemblies of God Lesotho. In 2021 I planted Revival Fellowship International in Butha-Buthe, and I serve my district as missions director and secretary. I also teach student pastors and lead a small-business training programme for church planters.</p>
+          <p>Seeing how much time good systems save in a clinic led me to study software development. I now write the tools I use every day: pharmacy records, stock taking, study planning and research instruments.</p>
+        </div>
+        <figure class="landscape">
+          <img src="images/Lesotho.jpg" alt="Mountain landscape in Lesotho" loading="lazy" width="1000" height="562">
+          <figcaption>Lesotho — the Mountain Kingdom, home.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="work" class="section alt">
+      <h2>What I do</h2>
+      <div class="cards three">
+        <article class="card">
+          <div class="icon" aria-hidden="true">℞</div>
+          <h3>Pharmacy</h3>
+          <p>Pharmacist at Naleli Medi-Clinic, Letšeng Diamonds, since 2015 — supply chain, procurement and stock control. Director of Grace Pharmacy and The Healing Hub Pharmacy in Maseru.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">✝</div>
+          <h3>Ministry &amp; teaching</h3>
+          <p>Founding pastor of Revival Fellowship International (AG Lesotho). Missions director for the Butha-Buthe district. Lecturer at Calvary Christian College and Kainos Equipping School. Programme director for Global Disciples small-business development.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">&lt;/&gt;</div>
+          <h3>Software</h3>
+          <p>Full-stack web and mobile development: Python/Flask, Node.js, C#/.NET and Blazor, Next.js and React, Kotlin for Android, with MongoDB and PostgreSQL.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <h2>Selected projects</h2>
+      <p class="section-intro">Things I have built — most of them to solve a problem in my own work.</p>
+      <div class="cards">
+        <article class="card project">
+          <p class="tag">C# · Blazor WebAssembly</p>
+          <h3>SmartStudy Planner</h3>
+          <p>A study planner that builds your schedule for you: it spreads work before each deadline, warns you when you are falling behind and learns how long tasks really take you.</p>
+          <a href="https://github.com/hlaolil/SmartStudyPlanner">View code →</a>
+        </article>
+        <article class="card project">
+          <p class="tag">Kotlin · Android</p>
+          <h3>Greek Paradigm Trainer</h3>
+          <p>A flash-card app that drills 605 inflected forms across 55 Biblical Greek paradigms, with a reference table for each.</p>
+          <a href="https://github.com/hlaolil/greek-paradigms-trainer">View code →</a>
+          <a href="https://youtu.be/8Wt8cYFHZhY">Watch demo →</a>
+        </article>
+        <article class="card project">
+          <p class="tag">Python · Flask · MongoDB</p>
+          <h3>Pharmacy Health Records</h3>
+          <p>A clinic pharmacy system for dispensing, receiving, registers and reports, paired with an Android stock-take app that lets several phones count shelves at once.</p>
+          <a href="https://github.com/hlaolil/HealthRecords-with-Android">View code →</a>
+        </article>
+        <article class="card project">
+          <p class="tag">Flask · Research</p>
+          <h3>PhD Research Instruments</h3>
+          <p>An online Q-sort in Sesotho and English for my research on bivocational ministry, with built-in factor analysis (PCA and varimax).</p>
+          <a href="https://github.com/hlaolil/PhD">View code →</a>
+        </article>
+        <article class="card project">
+          <p class="tag">Python · pandas</p>
+          <h3>Healthcare Data Analysis</h3>
+          <p>Filtering, grouping and charting a patient dataset to answer questions about diagnoses and length of stay.</p>
+          <a href="https://github.com/hlaolil/Data-Analysis-with-Python-and-Pandas">View code →</a>
+        </article>
+        <article class="card project">
+          <p class="tag">JavaScript · Vite</p>
+          <h3>TheologyHub</h3>
+          <p>A searchable shelf of theology books, dissertations and journal articles for research.</p>
+          <a href="https://theologicalresearch.netlify.app/">Visit site →</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="education" class="section alt">
+      <h2>Education</h2>
+      <ol class="timeline">
+        <li><span class="when">In progress</span><strong>PhD</strong> — Pan-Africa Theological Seminary (PAThS)</li>
+        <li><span class="when">2026</span><strong>Associate of Applied Science</strong> — Brigham Young University–Idaho (software development)</li>
+        <li><span class="when">2023</span><strong>Master of Theological Studies</strong> — Louisiana Baptist University</li>
+        <li><span class="when">2020</span><strong>Diploma in Procurement and Supply</strong> — CIPS</li>
+        <li><span class="when">2018</span><strong>MBA</strong> — University of Nicosia</li>
+        <li><span class="when">2012</span><strong>Bachelor of Pharmacy (Honours)</strong> — National University of Lesotho</li>
+      </ol>
+      <details class="coursework">
+        <summary>Coursework sites from my web development studies</summary>
+        <ul>
+          <li><a href="wwr/">Joyce Rafting — WDD 130 site project</a></li>
+          <li><a href="wdd130-home.html">My original WDD 130 home page</a></li>
+          <li><a href="https://hlaolil.github.io/wdd131/project/index.html">WDD 131 final project</a></li>
+          <li><a href="https://hlaolil.github.io/wdd231/project/">Revival Fellowship International — WDD 231 project</a></li>
+        </ul>
+      </details>
+    </section>
+
+    <section id="contact" class="section contact">
+      <h2>Get in touch</h2>
+      <p>I'm happy to talk about pharmacy systems, church planting, theological education or software.</p>
+      <div class="links">
+        <a class="btn" href="https://www.linkedin.com/in/letlotlo-hlaoli-98541237/">LinkedIn</a>
+        <a class="btn ghost" href="https://github.com/hlaolil">GitHub</a>
+        <a class="btn ghost" href="https://web.facebook.com/Tlokza">Facebook</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; <span id="year">2026</span> Letlotlo Hlaoli · Butha-Buthe, Lesotho</p>
+  </footer>
+
+  <script>
+    const btn = document.querySelector('.menu-btn');
+    const nav = document.getElementById('nav');
+    btn.addEventListener('click', () => {
+      const open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+    });
+    nav.addEventListener('click', e => {
+      if (e.target.tagName === 'A') { nav.classList.remove('open'); btn.setAttribute('aria-expanded', false); }
+    });
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
-<!--last modified: 10/05/2024-->
 </html>
