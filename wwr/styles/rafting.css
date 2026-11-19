@@ -475,3 +475,15 @@ main {
 .grid-item p {
     font-size: 1.2em;
 }
+/* --- Mobile fixes --- */
+img { max-width: 100%; height: auto; }
+@media (max-width: 600px) {
+    nav { width: 100%; }
+    .navigation { flex-wrap: wrap; }
+    .navigation a { padding: 12px 10px; text-align: center; }
+}
+@media (max-width: 600px) {
+    .employee-profiles { flex-wrap: wrap; justify-content: center; }
+    .trip-table { padding: 10px; overflow-x: auto; }
+    .trip-table th, .trip-table td { padding: 8px 6px; }
+}

@@ -117,7 +117,7 @@ aside h2 {
 /* Grid container */
 .grid {
     display: grid;
-    grid-template-columns: repeat(2f, 1fr); /* 2 columns of equal width */
+    grid-template-columns: repeat(2, 1fr); /* 2 columns of equal width */
     gap: 0px; /* Space between grid items */
     padding: 20px; /* Padding around the grid */
 }
@@ -125,4 +125,18 @@ aside h2 {
 /* Make the second row (links section) span both columns */
 .box:last-child {
     grid-column: span 2; /* Makes this item span across both columns */
+}
+
+/* --- Mobile fixes --- */
+@media (max-width: 600px) {
+    body, html { width: auto; height: auto; }
+    body { margin: 0 .5rem; }
+    header, nav { flex-wrap: wrap; gap: .25rem; justify-content: center; }
+    nav a { font-size: 1rem; }
+    .box, .profilecont { margin: 1rem 0; }
+    main, aside { margin: .5rem 0; }
+    .grid { grid-template-columns: 1fr; padding: 10px 0; }
+    main, aside { grid-column: 1; grid-row: auto; max-width: none; box-sizing: border-box; }
+    aside h2 { position: static; }
+    .box:last-child { grid-column: 1; }
 }
