@@ -3,7 +3,7 @@
 // into the private "Members Register" Google Sheet (one tab per organisation).
 
 // Paste the Apps Script web app URL (ends in /exec) between the quotes:
-const ENDPOINT = '';
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyVsEc6dDrrqkdCg95BF1iMBCstVi781gknr45Zfrp7hp7s0NVzp1kajd70qCr7er1d/exec';
 
 const ORGS = {
   aglbb: {
