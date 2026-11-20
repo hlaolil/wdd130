@@ -10,7 +10,7 @@ My personal website. It started as my WDD 130 (Web Fundamentals) home page at BY
 | --- | --- |
 | `index.html`, `styles/site.css` | The personal site: about, what I do, projects, membership forms, education and contact |
 | `theologyhub/` | Built copy of **TheologyHub**, which searches theology books, articles and dissertations and holds my bivocational-ministry reading list ([source](https://github.com/hlaolil/wdd330-project)) |
-| `books/` | Built copy of **BookHub**, my Zotero library as a bookshelf with the PhD coursework reading lists ([source](https://github.com/hlaolil/wdd-project2)) |
+| `books/` | Built copy of **BookHub**, my Zotero library as a bookshelf, filtered by folder, subject and reading status ([source](https://github.com/hlaolil/wdd-project2)) |
 | `members/` | Membership forms for **AGL BB** and **LDMCF** (Letšeng Diamonds Mine Christian Fellowship). Entries are posted to a Google Apps Script web app that saves each one as a row in a Google Sheet |
 | `tools/` | Pages I run myself (not linked from the site) to import the reading lists into Zotero and add summaries and covers |
 | `wwr/` | WDD 130 course project: a white-water rafting company website (home, about, trips, contact, site plan) |
