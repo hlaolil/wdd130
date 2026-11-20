@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Organise my Zotero library</title>
+  <style>
+    :root { --navy: #0f2a44; --green: #2f7d5b; --line: #e3ddd2; --muted: #5b6673; --red: #b3261e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #fbf9f5; color: #1d2733; line-height: 1.5; }
+    header { background: var(--navy); color: #fff; padding: 1.4rem 1.2rem; }
+    header h1 { margin: 0; font-family: Georgia, serif; font-size: 1.5rem; }
+    header p { margin: .4rem 0 0; color: #cfdbe6; }
+    main { max-width: 640px; margin: 0 auto; padding: 1.2rem; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: .8rem; }
+    input[type=password] { display: block; width: 100%; margin-top: .3rem; padding: .7rem; font: inherit; border: 1px solid #cfc8bb; border-radius: 8px; }
+    .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+    .check input { margin-top: .3rem; width: 1.1rem; height: 1.1rem; }
+    .hint { font-weight: 400; color: var(--muted); font-size: .9rem; }
+    button { width: 100%; padding: .9rem; font: inherit; font-weight: 600; color: #fff; background: var(--green); border: 0; border-radius: 999px; cursor: pointer; }
+    button.stop { background: #fff; color: var(--red); border: 1px solid var(--red); margin-top: .6rem; }
+    button:disabled { background: #9bb5a8; }
+    progress { width: 100%; height: 14px; }
+    #summary { font-weight: 600; margin: .5rem 0; }
+    #log { font-size: .88rem; margin: .4rem 0 0; max-height: 22rem; overflow: auto; }
+    #log div { padding: .15rem 0; border-bottom: 1px solid #f1ece3; }
+    .ok { color: var(--green); } .err { color: var(--red); } .dim { color: var(--muted); }
+    #log img { height: 44px; vertical-align: middle; margin-right: .4rem; border-radius: 2px; }
+  </style>
+  <style>ul.plan { margin:.4rem 0 0; padding-left:1.1rem; } ul.plan li { margin:.2rem 0; }</style>
+</head>
+<body>
+  <header>
+    <h1>Organise my Zotero library</h1>
+    <p>Adds purpose folders, subject tags and saved searches. Nothing is deleted or renamed.</p>
+  </header>
+  <main>
+    <div class="card">
+      <strong>What it will do</strong>
+      <ul class="plan hint">
+        <li><b>00 Inbox</b>: an empty folder for new items until you sort them.</li>
+        <li><b>01 Dissertation</b>: your bi-vocational ministry reading list moves in here.</li>
+        <li><b>02 Comprehensive exams</b>: Biblical studies, Theology, Leadership &amp; mission, Research. Each reading is added according to its course.</li>
+        <li><b>03 PhD coursework</b>: your eight course folders move in here, unchanged.</li>
+        <li><b>04 Teaching &amp; ministry</b>: an empty folder for Global Disciples, RFI and Calvary material.</li>
+        <li><b>Subject tags</b> on every reading, e.g. Hermeneutics, Luke–Acts &amp; the Spirit, African theology, Leadership, Research: qualitative.</li>
+        <li><b>Saved searches</b>: Key sources not yet read · To read · Cited in dissertation · Summaries to check.</li>
+      </ul>
+      <p class="hint" style="margin:.5rem 0 0">An item can sit in several folders at once in Zotero, so adding it to an exam folder doesn't remove it from its course folder. It's safe to run again: anything already done is skipped.</p>
+    </div>
+    <form id="form" class="card">
+      <label>Zotero API key (with write access)
+        <input id="key" type="password" autocomplete="off" required placeholder="Paste your key">
+      </label>
+      <button id="go" type="submit">Organise my library</button>
+    </form>
+    <div class="card" id="progress-card" hidden>
+      <progress id="bar" value="0" max="1"></progress>
+      <div id="summary"></div>
+      <div id="log"></div>
+    </div>
+  </main>
+<script>
+const ZOT = 'https://api.zotero.org';
+const LISTS = ['PhD coursework reading lists', 'Bi-vocational ministry reading list'];
+const $ = id => document.getElementById(id);
+let stopping = false;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/^(the|a|an)\s+/, '').split(/[:.(?]/)[0].replace(/[^a-z0-9]+/g, ' ').trim();
+const strip = s => String(s || '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n').replace(/<[^>]+>/g, '')
+  .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/\n{3,}/g, '\n\n').trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+function log(html, cls = '') {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  if (cls) d.className = cls;
+  $('log').prepend(d);
+}
+
+// ---------- Zotero ----------
+async function zot(path, key, opts = {}) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const res = await fetch(ZOT + path, {
+      ...opts,
+      headers: { 'Zotero-API-Key': key, 'Zotero-API-Version': '3', ...(opts.body ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) },
+    });
+    const wait = Number(res.headers.get('Backoff') || res.headers.get('Retry-After') || 0);
+    if (res.status === 429 || res.status === 503) { await sleep((wait || 5) * 1000); continue; }
+    if (wait) await sleep(wait * 1000);
+    if (!res.ok && res.status !== 412) throw new Error(`Zotero ${res.status}: ${await res.text()}`);
+    return res.status === 204 || res.status === 412 ? { status: res.status } : { status: res.status, json: await res.json() };
+  }
+  throw new Error('Zotero is busy. Try again in a few minutes.');
+}
+
+async function zotAll(path, key) {
+  const out = [];
+  for (let start = 0; ; start += 100) {
+    const { json } = await zot(`${path}${path.includes('?') ? '&' : '?'}limit=100&start=${start}`, key);
+    out.push(...json);
+    if (json.length < 100) return out;
+  }
+}
+
+
+const COMPS = ['Biblical studies', 'Theology', 'Leadership & mission', 'Research'];
+const SEARCHES = [
+  ['★ Key sources not yet read', [{ condition: 'tag', operator: 'is', value: '★ Key source' }, { condition: 'tag', operator: 'isNot', value: 'Read' }]],
+  ['To read', [{ condition: 'tag', operator: 'is', value: 'To read' }]],
+  ['Cited in dissertation', [{ condition: 'tag', operator: 'is', value: 'Cited in dissertation' }]],
+  ['Summaries to check (written by Claude)', [{ condition: 'extra', operator: 'contains', value: 'written summary (Claude)' }]],
+];
+const token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+const year = d => (String(d.date || '').match(/\d{4}/) || [''])[0];
+
+async function ensureCollection(user, key, cols, name, parent = false) {
+  const found = cols.find(c => c.data.name === name && (c.data.parentCollection || false) === parent);
+  if (found) return found.key;
+  const { json } = await zot(`/users/${user}/collections`, key, {
+    method: 'POST', body: JSON.stringify([{ name, parentCollection: parent }]), headers: { 'Zotero-Write-Token': token() },
+  });
+  const made = json.successful?.['0'];
+  if (!made) throw new Error(`Could not create folder "${name}"`);
+  cols.push(made);
+  log(`Folder created: ${esc(name)}`, 'ok');
+  return made.key;
+}
+async function moveUnder(user, key, cols, name, parentKey) {
+  const c = cols.find(x => x.data.name === name);
+  if (!c) { log(`Folder "${esc(name)}" not found, so it was not moved.`, 'dim'); return null; }
+  if (c.data.parentCollection === parentKey) return c.key;
+  const res = await zot(`/users/${user}/collections/${c.key}`, key, {
+    method: 'PATCH', body: JSON.stringify({ parentCollection: parentKey }), headers: { 'If-Unmodified-Since-Version': String(c.version) },
+  });
+  if (res.status === 412) throw new Error('A folder changed in Zotero meanwhile. Run the page again.');
+  c.data.parentCollection = parentKey;
+  log(`Moved "${esc(name)}" into its new folder`, 'ok');
+  return c.key;
+}
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const key = $('key').value.trim();
+  $('go').disabled = true;
+  $('progress-card').hidden = false;
+  $('log').textContent = '';
+  let updated = 0, unchanged = 0, unknown = 0, failed = 0;
+  try {
+    const plan = await (await fetch('zotero-organise.json?v=' + Date.now())).json();
+    const byKey = {};
+    for (const [k, v] of Object.entries(plan)) if (v.k) byKey[v.k] = v;
+    const { json: k } = await zot('/keys/current', key);
+    if (!k.access?.user?.write) throw new Error('This key cannot write to your library. Make a key with "Allow write access" ticked.');
+    const user = k.userID;
+    log('Key OK. Setting up folders…', 'dim');
+
+    const cols = await zotAll(`/users/${user}/collections?format=json`, key);
+    await ensureCollection(user, key, cols, '00 Inbox');
+    const diss = await ensureCollection(user, key, cols, '01 Dissertation');
+    const comps = await ensureCollection(user, key, cols, '02 Comprehensive exams');
+    const compKey = {};
+    for (const c of COMPS) compKey[c] = await ensureCollection(user, key, cols, c, comps);
+    const course = await ensureCollection(user, key, cols, '03 PhD coursework');
+    await ensureCollection(user, key, cols, '04 Teaching & ministry');
+    const bivo = await moveUnder(user, key, cols, LISTS[1], diss);
+    const phd = await moveUnder(user, key, cols, LISTS[0], course);
+
+    const lists = [bivo, phd].filter(Boolean);
+    const subs = cols.filter(c => lists.includes(c.data.parentCollection) || lists.includes(c.key)).map(c => c.key);
+    const items = new Map();
+    for (const ck of subs) for (const it of await zotAll(`/users/${user}/collections/${ck}/items/top?format=json`, key)) items.set(it.key, it);
+    const todo = [...items.values()];
+    log(`${todo.length} readings to tag.`, 'dim');
+    $('bar').max = todo.length || 1;
+
+    for (let i = 0; i < todo.length; i++) {
+      const it = todo[i], d = it.data;
+      const p = byKey[it.key] || plan[`${norm(d.title)}|${year(d)}`] || Object.entries(plan).find(([pk]) => pk.split('|')[0] === norm(d.title))?.[1];
+      if (!p) { unknown++; }
+      else {
+        const have = new Set((d.tags || []).map(t => t.tag));
+        const addTags = p.t.filter(t => !have.has(t));
+        const haveCols = new Set(d.collections || []);
+        const addCols = (p.c || []).map(c => compKey[c]).filter(c => c && !haveCols.has(c));
+        if (!addTags.length && !addCols.length) unchanged++;
+        else {
+          try {
+            const res = await zot(`/users/${user}/items/${it.key}`, key, {
+              method: 'PATCH',
+              body: JSON.stringify({ tags: [...(d.tags || []), ...addTags.map(tag => ({ tag }))], collections: [...haveCols, ...addCols] }),
+              headers: { 'If-Unmodified-Since-Version': String(it.version) },
+            });
+            if (res.status === 412) throw new Error('changed in Zotero meanwhile; run again to finish it');
+            updated++;
+            if (updated <= 40) log(`<b>${esc(d.title)}</b> — ${esc(addTags.join(', ') || 'added to exam folder')}`, 'ok');
+          } catch (err) {
+            failed++;
+            log(`<b>${esc(d.title)}</b> — ${esc(err.message)}`, 'err');
+          }
+        }
+      }
+      $('bar').value = i + 1;
+      $('summary').textContent = `${i + 1} of ${todo.length} · ${updated} updated · ${unchanged} already done${unknown ? ` · ${unknown} not in the plan` : ''}${failed ? ` · ${failed} errors` : ''}`;
+    }
+
+    const { json: have } = await zot(`/users/${user}/searches`, key);
+    const names = new Set(have.map(s => s.data.name));
+    const add = SEARCHES.filter(([n]) => !names.has(n)).map(([name, conditions]) => ({ name, conditions }));
+    if (add.length) {
+      await zot(`/users/${user}/searches`, key, { method: 'POST', body: JSON.stringify(add), headers: { 'Zotero-Write-Token': token() } });
+      log(`Saved searches added: ${add.map(s => esc(s.name)).join(' · ')}`, 'ok');
+    }
+    log('Done. Your new folders, tags and saved searches appear in Zotero after it syncs.', 'ok');
+  } catch (err) {
+    log('Stopped: ' + esc(err.message), 'err');
+  } finally {
+    $('go').disabled = false;
+  }
+});
+</script>
+</body>
+</html>
