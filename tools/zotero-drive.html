@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Bring my Drive readings into Zotero</title>
+  <style>
+    :root { --navy: #0f2a44; --green: #2f7d5b; --line: #e3ddd2; --muted: #5b6673; --red: #b3261e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #fbf9f5; color: #1d2733; line-height: 1.5; }
+    header { background: var(--navy); color: #fff; padding: 1.4rem 1.2rem; }
+    header h1 { margin: 0; font-family: Georgia, serif; font-size: 1.5rem; }
+    header p { margin: .4rem 0 0; color: #cfdbe6; }
+    main { max-width: 640px; margin: 0 auto; padding: 1.2rem; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: .8rem; }
+    input[type=password] { display: block; width: 100%; margin-top: .3rem; padding: .7rem; font: inherit; border: 1px solid #cfc8bb; border-radius: 8px; }
+    .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+    .check input { margin-top: .3rem; width: 1.1rem; height: 1.1rem; }
+    .hint { font-weight: 400; color: var(--muted); font-size: .9rem; }
+    button { width: 100%; padding: .9rem; font: inherit; font-weight: 600; color: #fff; background: var(--green); border: 0; border-radius: 999px; cursor: pointer; }
+    button.stop { background: #fff; color: var(--red); border: 1px solid var(--red); margin-top: .6rem; }
+    button:disabled { background: #9bb5a8; }
+    progress { width: 100%; height: 14px; }
+    #summary { font-weight: 600; margin: .5rem 0; }
+    #log { font-size: .88rem; margin: .4rem 0 0; max-height: 22rem; overflow: auto; }
+    #log div { padding: .15rem 0; border-bottom: 1px solid #f1ece3; }
+    .ok { color: var(--green); } .err { color: var(--red); } .dim { color: var(--muted); }
+    #log img { height: 44px; vertical-align: middle; margin-right: .4rem; border-radius: 2px; }
+  </style>
+    <style>
+    main { max-width: 980px; }
+    ul.plan { margin:.4rem 0 0; padding-left:1.1rem; } ul.plan li { margin:.2rem 0; }
+    details { background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:1rem; }
+    summary { padding:.9rem 1.1rem; font-weight:600; cursor:pointer; }
+    summary .hint { margin-left:.4rem; }
+    .tools { display:flex; gap:.8rem; flex-wrap:wrap; padding:0 1.1rem .6rem; font-size:.88rem; }
+    .tools a { color:var(--green); cursor:pointer; text-decoration:underline; }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; }
+    td { border-top:1px solid #f1ece3; padding:.35rem .4rem; vertical-align:top; }
+    td.c { width:1.6rem; } td.c input { width:1.05rem; height:1.05rem; margin-top:.35rem; }
+    td input[type=text], td select { width:100%; font:inherit; font-size:.86rem; padding:.25rem .35rem; border:1px solid #ddd6c9; border-radius:6px; background:#fff; }
+    td.t { width:46%; } td.a { width:20%; } td.y { width:4.2rem; } td.k { width:7.2rem; }
+    .meta { color:var(--muted); font-size:.78rem; margin-top:.15rem; overflow-wrap:anywhere; }
+    .meta a { color:var(--navy); }
+    .st { font-size:.78rem; font-weight:600; }
+    .st.found { color:var(--green); } .st.dupe { color:#8a6d00; } .st.check { color:#a14d00; } .st.done { color:var(--green); } .st.fail { color:var(--red); }
+    tr.dupe td { background:#fbf6e6; } tr.done td { opacity:.55; }
+    .bar { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+    @media (max-width:700px) {
+      table, tbody, tr, td { display:block; width:100% !important; }
+      tr { border-top:1px solid var(--line); padding:.4rem 0; display:grid; grid-template-columns:1.6rem 1fr; }
+      td { border:0; padding:.15rem .3rem; } td.c { grid-row:span 4; }
+      .bar { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bring my Drive readings into Zotero</h1>
+    <p>Books and articles found in your Google Drive that aren't in your Zotero library yet. You choose; nothing is added until you press Import.</p>
+  </header>
+  <main>
+    <div class="card">
+      <strong>How it works</strong>
+      <ul class="plan hint">
+        <li><b>1. Check my library.</b> Paste your key. The page reads your Zotero library and greys out anything you already have.</li>
+        <li><b>2. Look up details.</b> For each ticked reading it asks CrossRef (articles) or Open Library (books) for the proper title, authors, year and journal. A match is only used when the found title really appears in your file; otherwise the row keeps what's listed. Rows whose title had to be taken from the file's first lines say <i>check</i>.</li>
+        <li><b>3. Import ticked.</b> Each reading goes into <b>00 Inbox › From Google Drive</b> with a link to the file in Drive and the tag <i>From Google Drive</i>. Rows marked <i>check</i> also get the tag <i>Check details</i>.</li>
+      </ul>
+      <p class="hint" style="margin:.5rem 0 0">You can change any title, author or type in the table before importing. Running the page again is safe: imported readings show as already in Zotero.</p>
+    </div>
+    <form id="form" class="card">
+      <label>Zotero API key (with write access)
+        <input id="key" type="password" autocomplete="off" required placeholder="Paste your key">
+      </label>
+      <div class="bar">
+        <button id="scan" type="submit">1. Check my library</button>
+        <button id="look" type="button" disabled>2. Look up details</button>
+      </div>
+      <button id="imp" type="button" disabled style="margin-top:.7rem">3. Import ticked readings</button>
+      <button id="stop" type="button" class="stop" hidden>Stop</button>
+    </form>
+    <div class="card" id="progress-card" hidden>
+      <progress id="bar" value="0" max="1"></progress>
+      <div id="summary"></div>
+      <div id="log"></div>
+    </div>
+    <div id="groups"></div>
+  </main>
+<script>
+const ZOT = 'https://api.zotero.org';
+const $ = id => document.getElementById(id);
+let stopping = false;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/^(the|a|an)\s+/, '').split(/[:.(?]/)[0].replace(/[^a-z0-9]+/g, ' ').trim();
+const strip = s => String(s || '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n').replace(/<[^>]+>/g, '')
+  .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/\n{3,}/g, '\n\n').trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+function log(html, cls = '') {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  if (cls) d.className = cls;
+  $('log').prepend(d);
+}
+
+// ---------- Zotero ----------
+async function zot(path, key, opts = {}) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const res = await fetch(ZOT + path, {
+      ...opts,
+      headers: { 'Zotero-API-Key': key, 'Zotero-API-Version': '3', ...(opts.body ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) },
+    });
+    const wait = Number(res.headers.get('Backoff') || res.headers.get('Retry-After') || 0);
+    if (res.status === 429 || res.status === 503) { await sleep((wait || 5) * 1000); continue; }
+    if (wait) await sleep(wait * 1000);
+    if (!res.ok && res.status !== 412) throw new Error(`Zotero ${res.status}: ${await res.text()}`);
+    return res.status === 204 || res.status === 412 ? { status: res.status } : { status: res.status, json: await res.json() };
+  }
+  throw new Error('Zotero is busy. Try again in a few minutes.');
+}
+
+async function zotAll(path, key) {
+  const out = [];
+  for (let start = 0; ; start += 100) {
+    const { json } = await zot(`${path}${path.includes('?') ? '&' : '?'}limit=100&start=${start}`, key);
+    out.push(...json);
+    if (json.length < 100) return out;
+  }
+}
+
+
+
+const GROUPS = [
+  ['A', 'Academic and ministry readings', 'Theology, Bible, Luke–Acts, mission, leadership, education, research methods, Lesotho church history, AG Africa documents. Ticked by default.', true],
+  ['B', 'Popular Christian books and other reading', 'Devotional and popular ministry books, business and general titles, your own papers. Not ticked; tick any you want.', false],
+  ['U', 'Couldn\'t identify from the file name', 'Scanned or oddly named files with no readable text. Open each one in Drive, type its title, then tick it.', false],
+];
+const TYPES = { book: 'Book', journalArticle: 'Article', bookSection: 'Chapter', thesis: 'Thesis', report: 'Report', document: 'Document' };
+const FIELDS = {
+  book: ['publisher', 'place', 'edition', 'ISBN'],
+  journalArticle: ['publicationTitle', 'volume', 'issue', 'pages', 'DOI', 'ISSN'],
+  bookSection: ['bookTitle', 'publisher', 'place', 'pages', 'ISBN'],
+  thesis: ['university', 'thesisType'],
+  report: ['institution'],
+  document: ['publisher'],
+};
+const drive = id => `https://drive.google.com/file/d/${id}/view`;
+let rows = [], user = null, key = '';
+
+function creatorsFrom(list) {
+  return (list || []).filter(Boolean).map(n => {
+    n = n.trim();
+    if (n.includes(',')) { const [l, f] = n.split(/,\s*/, 2); return { creatorType: 'author', lastName: l, firstName: f || '' }; }
+    const p = n.split(/\s+/);
+    if (p.length === 1 || /Alliance|University|Church|Society|Association|Council|Ministries|Education$/.test(n)) return { creatorType: 'author', name: n };
+    return { creatorType: 'author', lastName: p.pop(), firstName: p.join(' ') };
+  });
+}
+const nameOf = c => c.name || [c.firstName, c.lastName].filter(Boolean).join(' ');
+
+function render() {
+  $('groups').innerHTML = '';
+  for (const [g, title, hint, def] of GROUPS) {
+    const mine = rows.filter(r => r.g === g);
+    const det = document.createElement('details');
+    if (g === 'A') det.open = true;
+    det.innerHTML = `<summary>${esc(title)} <span class="hint">(${mine.length}) · ${esc(hint)}</span></summary>
+      <div class="tools"><a data-a="all">Tick all</a><a data-a="none">Untick all</a></div>
+      <table><tbody></tbody></table>`;
+    const tb = det.querySelector('tbody');
+    for (const r of mine) {
+      if (r.checked === undefined) r.checked = def && !r.inZ;
+      const tr = document.createElement('tr');
+      r.tr = tr;
+      tr.innerHTML = `<td class="c"><input type="checkbox" aria-label="Import this reading"></td>
+        <td class="t"><input type="text" class="ti" aria-label="Title"><div class="meta"></div></td>
+        <td class="a"><input type="text" class="au" aria-label="Authors" placeholder="Last, First; …"></td>
+        <td class="y"><input type="text" class="yr" aria-label="Year" placeholder="Year"></td>
+        <td class="k"><select aria-label="Type">${Object.entries(TYPES).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select><div class="st"></div></td>`;
+      const [cb] = tr.getElementsByTagName('input');
+      cb.checked = r.checked;
+      cb.onchange = () => { r.checked = cb.checked; };
+      tr.querySelector('.ti').value = r.title;
+      tr.querySelector('.ti').oninput = e => { r.title = e.target.value; r.edited = true; };
+      tr.querySelector('.au').value = (r.au || []).join('; ');
+      tr.querySelector('.au').oninput = e => { r.au = e.target.value.split(';').map(s => s.trim()).filter(Boolean); r.edited = true; };
+      tr.querySelector('.yr').value = r.date || '';
+      tr.querySelector('.yr').oninput = e => { r.date = e.target.value; };
+      tr.querySelector('select').value = r.type;
+      tr.querySelector('select').onchange = e => { r.type = e.target.value; };
+      paint(r);
+      tb.append(tr);
+    }
+    det.querySelectorAll('.tools a').forEach(a => a.onclick = () => {
+      for (const r of mine) if (!r.done) { r.checked = a.dataset.a === 'all' && !r.inZ; r.tr.querySelector('input').checked = r.checked; }
+    });
+    $('groups').append(det);
+  }
+}
+
+function paint(r) {
+  const tr = r.tr; if (!tr) return;
+  tr.querySelector('.ti').value = r.title;
+  tr.querySelector('.au').value = (r.au || []).join('; ');
+  tr.querySelector('.yr').value = r.date || '';
+  tr.querySelector('select').value = r.type;
+  tr.querySelector('input').checked = r.checked;
+  const extra = [r.pub, r.vol && `vol. ${r.vol}`, r.iss && `no. ${r.iss}`, r.pages, r.doi && `doi:${r.doi}`].filter(Boolean).join(' · ');
+  tr.querySelector('.meta').innerHTML = `<a href="${drive(r.id)}" target="_blank" rel="noopener">${esc(r.f.split(' — ').pop())}</a>${r.more ? ` + ${r.more.length} more` : ''}`
+    + (extra ? `<br>${esc(extra)}` : '') + (r.hint && r.op ? `<br><i>Starts:</i> ${esc(r.hint.slice(0, 140))}…` : '');
+  const st = tr.querySelector('.st');
+  const [cls, txt] = r.done ? ['done', '✓ imported'] : r.failed ? ['fail', 'failed'] : r.inZ ? ['dupe', 'already in Zotero'] : r.found ? ['found', `✓ ${r.found}`] : r.check ? ['check', 'check'] : r.kept ? ['', 'kept as is'] : ['', ''];
+  st.className = 'st ' + cls; st.textContent = txt;
+  tr.className = r.done ? 'done' : r.inZ ? 'dupe' : '';
+}
+
+const busy = on => {
+  for (const b of ['scan', 'look', 'imp']) $(b).disabled = on || (b !== 'scan' && !user);
+  $('stop').hidden = !on; stopping = false;
+};
+
+// ---------- 1. check library ----------
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  key = $('key').value.trim();
+  busy(true);
+  $('progress-card').hidden = false; $('log').textContent = '';
+  try {
+    if (!rows.length) rows = await (await fetch('zotero-drive.json?v=' + Date.now())).json();
+    const { json: k } = await zot('/keys/current', key);
+    if (!k.access?.user?.write) throw new Error('This key cannot write to your library. Make a key with "Allow write access" ticked.');
+    user = k.userID;
+    log('Key OK. Reading your library…', 'dim');
+    const have = await zotAll(`/users/${user}/items/top?format=json&itemType=-attachment`, key);
+    const titles = new Set(), dois = new Set(), files = new Set();
+    for (const it of have) {
+      const d = it.data;
+      if (d.title) titles.add(norm(d.title));
+      if (d.DOI) dois.add(d.DOI.toLowerCase());
+      for (const m of String((d.url || '') + ' ' + (d.extra || '')).matchAll(/drive\.google\.com\/file\/d\/([\w-]+)/g)) files.add(m[1]);
+    }
+    let dup = 0;
+    for (const r of rows) {
+      r.inZ = files.has(r.id) || (r.doi && dois.has(r.doi.toLowerCase())) || (!r.op && norm(r.title).length > 3 && titles.has(norm(r.title)));
+      if (r.inZ) { dup++; r.checked = false; }
+    }
+    render();
+    log(`${have.length} items in your library. ${dup} of the ${rows.length} Drive readings are already there.`, 'ok');
+    $('summary').textContent = `${rows.filter(r => r.checked).length} readings ticked for import.`;
+  } catch (err) { log('Stopped: ' + esc(err.message), 'err'); user = null; }
+  finally { busy(false); }
+});
+$('stop').onclick = () => { stopping = true; };
+
+// ---------- 2. look up ----------
+const words = s => norm(s).split(' ').filter(Boolean);
+function appearsIn(found, text) {
+  const f = norm(found), t = ' ' + String(text || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ') + ' ';
+  return f.length >= 12 && t.includes(' ' + f + ' ');
+}
+async function getJSON(url) {
+  for (let i = 0; i < 3; i++) {
+    const res = await fetch(url);
+    if (res.status === 429) { await sleep(3000); continue; }
+    if (!res.ok) return null;
+    return res.json();
+  }
+  return null;
+}
+function fromCrossref(r, w) {
+  const map = { 'journal-article': 'journalArticle', 'book-chapter': 'bookSection', book: 'book', monograph: 'book', 'edited-book': 'book', dissertation: 'thesis', report: 'report' };
+  r.type = map[w.type] || r.type;
+  r.title = [w.title?.[0], w.subtitle?.[0]].filter(Boolean).join(': ').replace(/\s+/g, ' ');
+  if (w.author?.length) r.au = w.author.map(a => a.family ? `${a.family}, ${a.given || ''}`.trim() : a.name);
+  else if (w.editor?.length) r.au = w.editor.map(a => `${a.family}, ${a.given || ''}`.trim());
+  const dp = (w['published-print'] || w.issued || w['published-online'])?.['date-parts']?.[0];
+  if (dp?.[0]) r.date = String(dp[0]);
+  r.pub = w['container-title']?.[0] || (r.type === 'book' ? w.publisher : '') || '';
+  r.publisher = w.publisher; r.vol = w.volume; r.iss = w.issue; r.pages = w.page; r.doi = w.DOI;
+  r.issn = w.ISSN?.[0]; r.isbn = w.ISBN?.[0];
+  r.found = 'CrossRef'; r.check = false;
+}
+async function lookup(r) {
+  if (r.doi) {
+    const j = await getJSON(`https://api.crossref.org/works/${encodeURIComponent(r.doi)}`);
+    if (j?.message) { fromCrossref(r, j.message); return; }
+    r.doi = '';
+  }
+  const text = `${r.title} ${r.hint || ''} ${r.f}`;
+  if (r.type !== 'book' || r.op) {
+    const q = (r.op ? r.hint : `${r.title} ${(r.au || []).join(' ')}`).slice(0, 300);
+    if (q.trim()) {
+      const j = await getJSON(`https://api.crossref.org/works?rows=5&query.bibliographic=${encodeURIComponent(q)}`);
+      const hit = j?.message?.items?.find(w => w.title?.[0] && appearsIn(w.title[0], text));
+      if (hit) { fromCrossref(r, hit); return; }
+    }
+  }
+  if (r.type === 'book' || r.type === 'document') {
+    const t = r.title.split(/[:(]/)[0].slice(0, 120), a = (r.au?.[0] || '').split(/[ ,]/).filter(x => x.length > 2).pop() || '';
+    const j = await getJSON(`https://openlibrary.org/search.json?limit=5&fields=title,subtitle,author_name,first_publish_year,publisher,isbn&title=${encodeURIComponent(t)}${a ? '&author=' + encodeURIComponent(a) : ''}`);
+    const nt = words(t).join(' ');
+    const hit = j?.docs?.find(d => { const nd = words(d.title).join(' '); return nd && nt && (nd.startsWith(nt.slice(0, 25)) || nt.startsWith(nd)) && nd.length >= Math.min(12, nt.length); });
+    if (hit) {
+      r.type = 'book';
+      r.title = [hit.title, hit.subtitle].filter(Boolean).join(': ');
+      if (hit.author_name?.length) r.au = hit.author_name.slice(0, 4).map(n => { const p = n.split(' '); const l = p.pop(); return p.length ? `${l}, ${p.join(' ')}` : l; });
+      if (hit.first_publish_year) r.date = String(hit.first_publish_year);
+      r.publisher = hit.publisher?.[0]; r.isbn = hit.isbn?.[0];
+      r.found = 'Open Library'; r.check = false;
+      return;
+    }
+  }
+  r.check = !!r.op; r.kept = !r.op;
+}
+$('look').onclick = async () => {
+  busy(true);
+  const todo = rows.filter(r => r.checked && !r.done && !r.found && !r.edited);
+  $('bar').max = todo.length || 1; $('bar').value = 0;
+  let ok = 0, chk = 0, kept = 0;
+  for (let i = 0; i < todo.length && !stopping; i++) {
+    try { await lookup(todo[i]); } catch { todo[i].check = true; }
+    todo[i].found ? ok++ : todo[i].check ? chk++ : kept++;
+    paint(todo[i]);
+    $('bar').value = i + 1;
+    $('summary').textContent = `${i + 1} of ${todo.length} looked up · ${ok} found · ${kept} kept as listed · ${chk} to check`;
+    await sleep(120);
+  }
+  log(stopping ? 'Look-up stopped. Press it again to carry on.' : `Look-up finished: ${ok} found online, ${kept} kept as listed, ${chk} marked “check” (the title came from the file’s first lines). Change any row before importing.`, 'ok');
+  busy(false);
+};
+
+// ---------- 3. import ----------
+function toItem(r, col) {
+  const type = TYPES[r.type] ? r.type : 'document';
+  const it = { itemType: type, title: r.title.trim(), creators: creatorsFrom(r.au), date: r.date || '', url: drive(r.id), collections: [col],
+    tags: [{ tag: 'From Google Drive' }, ...(r.op && !r.found && !r.edited ? [{ tag: 'Check details' }] : []), ...(r.ag ? [{ tag: 'AG Africa: Decade of Pentecost' }] : [])] };
+  const extra = [`Google Drive file: ${r.f.split(' — ').pop()}`];
+  if (r.more) extra.push(...r.more.map((id, n) => `Also part ${n + 2}: ${drive(id)}`));
+  if (r.found) extra.push(`Details from ${r.found}`);
+  it.extra = extra.join('\n');
+  const f = FIELDS[type];
+  const set = (k, v) => { if (v && f.includes(k)) it[k] = String(v); };
+  set('publicationTitle', r.pub); set('bookTitle', r.pub); set('volume', r.vol); set('issue', r.iss); set('pages', r.pages);
+  set('DOI', r.doi); set('ISSN', r.issn); set('ISBN', r.isbn); set('edition', r.ed);
+  set('publisher', r.publisher || (type === 'book' || type === 'document' ? r.pub : ''));
+  set('university', r.uni || (type === 'thesis' ? r.pub || r.publisher : '')); set('institution', type === 'report' ? r.publisher || r.pub : '');
+  return it;
+}
+$('imp').onclick = async () => {
+  const todo = rows.filter(r => r.checked && !r.done && r.title.trim());
+  if (!todo.length) { log('Nothing is ticked.', 'dim'); return; }
+  busy(true);
+  $('bar').max = todo.length; $('bar').value = 0;
+  let made = 0, failed = 0;
+  try {
+    const cols = await zotAll(`/users/${user}/collections?format=json`, key);
+    const ensure = async (name, parent = false) => {
+      const found = cols.find(c => c.data.name === name && (c.data.parentCollection || false) === parent);
+      if (found) return found.key;
+      const { json } = await zot(`/users/${user}/collections`, key, { method: 'POST', body: JSON.stringify([{ name, parentCollection: parent }]), headers: { 'Zotero-Write-Token': token() } });
+      const c = json.successful?.['0']; if (!c) throw new Error(`Could not create folder "${name}"`);
+      cols.push(c); log(`Folder created: ${esc(name)}`, 'ok'); return c.key;
+    };
+    const col = await ensure('From Google Drive', await ensure('00 Inbox'));
+    for (let i = 0; i < todo.length && !stopping; i += 50) {
+      const batch = todo.slice(i, i + 50);
+      const { json } = await zot(`/users/${user}/items`, key, { method: 'POST', body: JSON.stringify(batch.map(r => toItem(r, col))), headers: { 'Zotero-Write-Token': token() } });
+      batch.forEach((r, n) => {
+        if (json.successful?.[n] || json.unchanged?.[n]) { r.done = true; r.checked = false; made++; }
+        else { r.failed = true; failed++; log(`<b>${esc(r.title)}</b> — ${esc(json.failed?.[n]?.message || 'not saved')}`, 'err'); }
+        paint(r);
+      });
+      $('bar').value = Math.min(i + 50, todo.length);
+      $('summary').textContent = `${made} imported${failed ? ` · ${failed} failed` : ''} of ${todo.length}`;
+    }
+    log(`Done: ${made} readings are in 00 Inbox › From Google Drive. They appear in Zotero and BookHub after Zotero syncs.`, 'ok');
+  } catch (err) { log('Stopped: ' + esc(err.message), 'err'); }
+  finally { busy(false); }
+};
+const token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+</script>
+</body>
+</html>
