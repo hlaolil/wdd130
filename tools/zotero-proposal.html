@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>File my proposal sources in Zotero</title>
+  <style>
+    :root { --navy: #0f2a44; --green: #2f7d5b; --line: #e3ddd2; --muted: #5b6673; --red: #b3261e; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #fbf9f5; color: #1d2733; line-height: 1.5; }
+    header { background: var(--navy); color: #fff; padding: 1.4rem 1.2rem; }
+    header h1 { margin: 0; font-family: Georgia, serif; font-size: 1.5rem; }
+    header p { margin: .4rem 0 0; color: #cfdbe6; }
+    main { max-width: 640px; margin: 0 auto; padding: 1.2rem; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
+    label { display: block; font-weight: 600; margin-bottom: .8rem; }
+    input[type=password] { display: block; width: 100%; margin-top: .3rem; padding: .7rem; font: inherit; border: 1px solid #cfc8bb; border-radius: 8px; }
+    .check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+    .check input { margin-top: .3rem; width: 1.1rem; height: 1.1rem; }
+    .hint { font-weight: 400; color: var(--muted); font-size: .9rem; }
+    button { width: 100%; padding: .9rem; font: inherit; font-weight: 600; color: #fff; background: var(--green); border: 0; border-radius: 999px; cursor: pointer; }
+    button.stop { background: #fff; color: var(--red); border: 1px solid var(--red); margin-top: .6rem; }
+    button:disabled { background: #9bb5a8; }
+    progress { width: 100%; height: 14px; }
+    #summary { font-weight: 600; margin: .5rem 0; }
+    #log { font-size: .88rem; margin: .4rem 0 0; max-height: 22rem; overflow: auto; }
+    #log div { padding: .15rem 0; border-bottom: 1px solid #f1ece3; }
+    .ok { color: var(--green); } .err { color: var(--red); } .dim { color: var(--muted); }
+    #log img { height: 44px; vertical-align: middle; margin-right: .4rem; border-radius: 2px; }
+  </style>
+    <style>
+    main { max-width: 980px; }
+    ul.plan { margin:.4rem 0 0; padding-left:1.1rem; } ul.plan li { margin:.2rem 0; }
+    details { background:#fff; border:1px solid var(--line); border-radius:12px; margin-bottom:1rem; }
+    summary { padding:.9rem 1.1rem; font-weight:600; cursor:pointer; }
+    table { width:100%; border-collapse:collapse; font-size:.88rem; }
+    td { border-top:1px solid #f1ece3; padding:.4rem .6rem; vertical-align:top; }
+    td.s { width:9rem; font-size:.8rem; font-weight:600; }
+    .s.found { color:var(--green); } .s.new { color:var(--navy); } .s.done { color:var(--green); } .s.fail { color:var(--red); }
+    .meta { color:var(--muted); font-size:.8rem; margin-top:.15rem; }
+    .chk { color:#a14d00; }
+    @media (max-width:700px){ table,tbody,tr,td{display:block;width:100%!important} tr{border-top:1px solid var(--line);padding:.3rem 0} td{border:0;padding:.1rem .4rem} }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>File my proposal sources in Zotero</h1>
+    <p>Every work in the reference list of your proposal outline (“Toward a Contextual Theology of Bi-vocational Ministry”), filed by chapter so BookHub shows them where you use them.</p>
+  </header>
+  <main>
+    <div class="card">
+      <strong>What this page does</strong>
+      <ul class="plan hint">
+        <li>Makes folders inside <b>01 Dissertation</b>: <b>Ch 2 General literature</b> (with one folder for each section of the chapter), <b>Ch 3 Biblical-theological foundation</b> and <b>Ch 4 Methodology</b>.</li>
+        <li>Works already in your library are <b>moved into</b> their chapter folders (they stay in their other folders too). Works not in your library are <b>added</b>, with the details from your reference list.</li>
+        <li>Every one gets the tag <i>Proposal reference list</i>. Entries your outline marks as still to be checked get <i>To confirm</i>, with what to check written in the item. The six works the outline cites but the reference list leaves out get <i>Add to reference list</i>.</li>
+        <li>Nothing is deleted. Press <b>Check</b> first to see the plan; nothing changes until you press <b>File them</b>.</li>
+      </ul>
+    </div>
+    <form id="form" class="card">
+      <label>Zotero API key (with write access)
+        <input id="key" type="password" autocomplete="off" required placeholder="Paste your key">
+      </label>
+      <button id="scan" type="submit">1. Check my library</button>
+      <button id="go" type="button" disabled style="margin-top:.7rem">2. File them</button>
+      <button id="stop" type="button" class="stop" hidden>Stop</button>
+    </form>
+    <div class="card" id="progress-card" hidden>
+      <progress id="bar" value="0" max="1"></progress>
+      <div id="summary"></div>
+      <div id="log"></div>
+    </div>
+    <div id="groups"></div>
+  </main>
+<script>
+const ZOT = 'https://api.zotero.org';
+const $ = id => document.getElementById(id);
+let stopping = false;
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/^(the|a|an)\s+/, '').split(/[:.(?]/)[0].replace(/[^a-z0-9]+/g, ' ').trim();
+const strip = s => String(s || '').replace(/<br\s*\/?>/gi, '\n').replace(/<\/p>/gi, '\n\n').replace(/<[^>]+>/g, '')
+  .replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/\n{3,}/g, '\n\n').trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+function log(html, cls = '') {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  if (cls) d.className = cls;
+  $('log').prepend(d);
+}
+
+// ---------- Zotero ----------
+async function zot(path, key, opts = {}) {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const res = await fetch(ZOT + path, {
+      ...opts,
+      headers: { 'Zotero-API-Key': key, 'Zotero-API-Version': '3', ...(opts.body ? { 'Content-Type': 'application/json' } : {}), ...(opts.headers || {}) },
+    });
+    const wait = Number(res.headers.get('Backoff') || res.headers.get('Retry-After') || 0);
+    if (res.status === 429 || res.status === 503) { await sleep((wait || 5) * 1000); continue; }
+    if (wait) await sleep(wait * 1000);
+    if (!res.ok && res.status !== 412) throw new Error(`Zotero ${res.status}: ${await res.text()}`);
+    return res.status === 204 || res.status === 412 ? { status: res.status } : { status: res.status, json: await res.json() };
+  }
+  throw new Error('Zotero is busy. Try again in a few minutes.');
+}
+
+async function zotAll(path, key) {
+  const out = [];
+  for (let start = 0; ; start += 100) {
+    const { json } = await zot(`${path}${path.includes('?') ? '&' : '?'}limit=100&start=${start}`, key);
+    out.push(...json);
+    if (json.length < 100) return out;
+  }
+}
+
+
+
+const CH2 = 'Ch 2 General literature';
+let plan = null, user = null, key = '', lib = [];
+const last = a => a.split(',')[0].trim().toLowerCase();
+const nameOf = c => c.lastName || c.name || '';
+function creators(list, editors) {
+  return list.map(n => n.includes(',') ? { creatorType: editors ? 'editor' : 'author', lastName: n.split(',')[0].trim(), firstName: n.split(',').slice(1).join(',').trim() }
+    : { creatorType: editors ? 'editor' : 'author', name: n });
+}
+function match(r) {
+  const t = norm(r.title), who = last(r.au[0] || '');
+  return lib.find(it => {
+    const d = it.data;
+    if (r.doi && d.DOI && d.DOI.toLowerCase() === r.doi.toLowerCase()) return true;
+    if (norm(d.title) !== t || t.length < 4) return false;
+    return !who || (d.creators || []).some(c => nameOf(c).toLowerCase().includes(who)) || !(d.creators || []).length;
+  });
+}
+function render() {
+  $('groups').innerHTML = '';
+  for (const sec of plan.sections) {
+    const mine = plan.items.filter(r => r.where.includes(sec));
+    const det = document.createElement('details');
+    det.open = true;
+    const label = sec.startsWith('2.') ? `${CH2} › ${sec}` : sec;
+    det.innerHTML = `<summary>${esc(label)} <span class="hint">(${mine.length})</span></summary><table><tbody></tbody></table>`;
+    const tb = det.querySelector('tbody');
+    for (const r of mine) {
+      const tr = document.createElement('tr');
+      const st = r.done ? ['done', '✓ filed'] : r.failed ? ['fail', 'failed'] : r.found ? ['found', 'in library: will move'] : user ? ['new', 'new: will add'] : ['', ''];
+      tr.innerHTML = `<td><b>${esc(r.title)}</b><div class="meta">${esc(r.au.map(a => a.split(',')[0]).join(', '))}${r.date ? ', ' + esc(r.date) : ''}${r.check ? ` · <span class="chk">to confirm: ${esc(r.check)}</span>` : ''}</div></td><td class="s ${st[0]}">${st[1]}</td>`;
+      tb.append(tr);
+    }
+    $('groups').append(det);
+  }
+}
+const busy = on => { $('scan').disabled = on; $('go').disabled = on || !user; $('stop').hidden = !on; stopping = false; };
+$('stop').onclick = () => { stopping = true; };
+(async () => { plan = await (await fetch('zotero-proposal.json?v=' + Date.now())).json(); render(); })();
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  key = $('key').value.trim(); busy(true);
+  $('progress-card').hidden = false; $('log').textContent = '';
+  try {
+    const { json: k } = await zot('/keys/current', key);
+    if (!k.access?.user?.write) throw new Error('This key cannot write to your library. Make a key with "Allow write access" ticked.');
+    user = k.userID;
+    log('Key OK. Reading your library…', 'dim');
+    lib = await zotAll(`/users/${user}/items/top?format=json&itemType=-attachment`, key);
+    let found = 0;
+    for (const r of plan.items) { const m = match(r); r.found = m ? m.key : null; if (m) found++; }
+    render();
+    log(`${lib.length} items in your library. Of the ${plan.items.length} works in the outline, ${found} are already there and ${plan.items.length - found} will be added.`, 'ok');
+  } catch (err) { log('Stopped: ' + esc(err.message), 'err'); user = null; }
+  finally { busy(false); }
+});
+
+function newItem(r) {
+  const it = { itemType: r.type, title: r.title, creators: creators(r.au, r.editors), date: r.date || '' };
+  const put = (f, v) => { if (v) it[f] = v; };
+  if (r.type === 'journalArticle' || r.type === 'magazineArticle') { put('publicationTitle', r.pub); put('volume', r.vol); put('issue', r.iss); put('pages', r.pages); }
+  if (r.type === 'journalArticle') put('DOI', r.doi);
+  if (r.type === 'book') { put('publisher', r.publisher); put('place', r.place); put('edition', r.edition); put('series', r.series); }
+  if (r.type === 'report') { put('institution', r.publisher); put('place', r.place); }
+  if (r.type === 'thesis') { put('university', r.uni); put('thesisType', r.ttype); }
+  if (r.type === 'webpage') put('websiteTitle', r.site);
+  put('url', r.url || (r.doi ? 'https://doi.org/' + r.doi : ''));
+  return it;
+}
+function tagsFor(r) {
+  return ['Proposal reference list', ...(r.check ? ['To confirm'] : []), ...(r.missing ? ['Add to reference list'] : []), ...(r.key ? ['★ Key source'] : [])];
+}
+
+$('go').onclick = async () => {
+  busy(true);
+  let done = 0, failed = 0;
+  try {
+    const cols = await zotAll(`/users/${user}/collections?format=json`, key);
+    const ensure = async (name, parent = false) => {
+      const f = cols.find(c => c.data.name === name && (c.data.parentCollection || false) === parent);
+      if (f) return f.key;
+      const { json } = await zot(`/users/${user}/collections`, key, { method: 'POST', body: JSON.stringify([{ name, parentCollection: parent }]), headers: { 'Zotero-Write-Token': token() } });
+      const c = json.successful?.['0']; if (!c) throw new Error(`Could not create folder "${name}"`);
+      cols.push(c); log(`Folder created: ${esc(name)}`, 'ok'); return c.key;
+    };
+    const diss = await ensure('01 Dissertation');
+    const ch2 = await ensure(CH2, diss);
+    const folder = {};
+    for (const s of plan.sections) folder[s] = await ensure(s, s.startsWith('2.') ? ch2 : diss);
+    const todo = plan.items.filter(r => !r.done);
+    $('bar').max = todo.length; $('bar').value = 0;
+    // existing items: PATCH one by one
+    for (const r of todo.filter(r => r.found)) {
+      if (stopping) break;
+      try {
+        const { json: it } = await zot(`/users/${user}/items/${r.found}`, key);
+        const d = it.data;
+        const colsNew = [...new Set([...(d.collections || []), ...r.where.map(s => folder[s])])];
+        const have = new Set((d.tags || []).map(t => t.tag));
+        const tags = [...(d.tags || []), ...tagsFor(r).filter(t => !have.has(t)).map(tag => ({ tag }))];
+        const extra = r.check && !String(d.extra || '').includes('To confirm:') ? `${d.extra ? d.extra + '\n' : ''}To confirm: ${r.check}` : d.extra;
+        const res = await zot(`/users/${user}/items/${r.found}`, key, { method: 'PATCH', body: JSON.stringify({ collections: colsNew, tags, extra }), headers: { 'If-Unmodified-Since-Version': it.version } });
+        if (res.status === 412) throw new Error('changed in Zotero meanwhile; press File them again');
+        r.done = true; done++;
+      } catch (err) { r.failed = true; failed++; log(`<b>${esc(r.title)}</b>: ${esc(err.message)}`, 'err'); }
+      $('bar').value = done + failed; $('summary').textContent = `${done} filed${failed ? ` · ${failed} failed` : ''}`;
+      await sleep(80);
+    }
+    // new items: POST in one batch
+    const fresh = todo.filter(r => !r.found && !r.done);
+    for (let i = 0; i < fresh.length && !stopping; i += 50) {
+      const batch = fresh.slice(i, i + 50);
+      const body = batch.map(r => ({ ...newItem(r), collections: r.where.map(s => folder[s]), tags: tagsFor(r).map(tag => ({ tag })), extra: r.check ? `To confirm: ${r.check}` : '' }));
+      const { json } = await zot(`/users/${user}/items`, key, { method: 'POST', body: JSON.stringify(body), headers: { 'Zotero-Write-Token': token() } });
+      batch.forEach((r, n) => {
+        if (json.successful?.[n]) { r.done = true; done++; }
+        else { r.failed = true; failed++; log(`<b>${esc(r.title)}</b>: ${esc(json.failed?.[n]?.message || 'not saved')}`, 'err'); }
+      });
+      $('bar').value = done + failed;
+    }
+    render();
+    $('summary').textContent = `${done} filed${failed ? ` · ${failed} failed` : ''}`;
+    log(stopping ? 'Stopped. Press File them again to finish.' : `Done. Your sources are in 01 Dissertation, by chapter. BookHub shows them after Zotero syncs (press Refresh in BookHub).`, 'ok');
+  } catch (err) { log('Stopped: ' + esc(err.message), 'err'); }
+  finally { busy(false); }
+};
+const token = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+</script>
+</body>
+</html>
