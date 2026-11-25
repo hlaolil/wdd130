@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membership Register · Admin</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="members.css">
+  <style>
+    main { max-width: 1000px; }
+    .login { max-width: 460px; margin: 0 auto; }
+    .login label { margin-bottom: 1rem; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .8rem; margin: 0 0 1.2rem; }
+    .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: .7rem .9rem; }
+    .stat b { display: block; font-family: "Fraunces", Georgia, serif; font-size: 1.6rem; color: var(--navy); }
+    .stat span { color: var(--muted); font-size: .85rem; }
+    .tools { display: flex; gap: .7rem; flex-wrap: wrap; align-items: end; margin-bottom: 1rem; }
+    .tools label { flex: 1 1 220px; }
+    .btn { display: inline-block; padding: .7rem 1.1rem; border: 0; border-radius: 8px; background: var(--navy); color: #fff; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+    .btn.light { background: #fff; color: var(--navy); border: 1px solid var(--navy); }
+    .btn:focus-visible { outline: 3px solid #a9d5c0; outline-offset: 2px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    td a { color: var(--green); font-weight: 600; text-decoration: none; white-space: nowrap; }
+    td.n { color: var(--muted); width: 2.5rem; }
+    .err { color: #b3261e; margin: .6rem 0 0; }
+    .top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .top h2 { color: var(--navy); }
+    @media (max-width: 640px) {
+      thead { display: none; }
+      tr { display: block; padding: .6rem 0; border-bottom: 1px solid var(--line); }
+      td { display: block; border: 0; padding: .1rem 0; }
+      td.n { display: none; }
+      td[data-l]::before { content: attr(data-l) ": "; color: var(--muted); font-size: .85rem; }
+      td.name { font-weight: 600; }
+    }
+  </style>
+</head>
+<body>
+  <header class="band">
+    <a class="back" href="../">← Letlotlo Hlaoli</a>
+    <p class="eyebrow">Admin</p>
+    <h1>Membership register</h1>
+  </header>
+
+  <main>
+    <form id="login" class="card login">
+      <label>Organisation
+        <select id="org" required>
+          <option value="aglbb">AGL BB: Assemblies of God Lesotho, Butha-Buthe District</option>
+          <option value="ldmcf">LDMCF: Letšeng Diamonds Mine Christian Fellowship</option>
+        </select>
+      </label>
+      <label>Admin password
+        <input id="password" type="password" required autocomplete="current-password">
+      </label>
+      <button class="btn" type="submit">Open register</button>
+      <p id="login-msg" class="err" role="alert"></p>
+    </form>
+
+    <section id="register" class="card" hidden>
+      <div class="top">
+        <h2 id="title"></h2>
+        <div>
+          <button id="csv" class="btn" type="button">Download spreadsheet</button>
+          <button id="logout" class="btn light" type="button">Close</button>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="tools">
+        <label>Search by name, phone, village or church
+          <input id="q" type="search" placeholder="Type to search">
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Name</th><th>Contact number</th><th>Village / Town</th><th>Local church</th><th>Joined</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+<script>
+// Same Apps Script web app the forms post to (see form.js).
+const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyVsEc6dDrrqkdCg95BF1iMBCstVi781gknr45Zfrp7hp7s0NVzp1kajd70qCr7er1d/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let data = null; // kept in this tab only; closing the tab forgets it
+
+$('login').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = e.submitter || $('login').querySelector('button');
+  btn.disabled = true; btn.textContent = 'Opening…'; $('login-msg').textContent = '';
+  try {
+    const body = new URLSearchParams({ action: 'admin', org: $('org').value, password: $('password').value });
+    const res = await fetch(ENDPOINT, { method: 'POST', body });
+    const json = await res.json();
+    if (json.error) throw new Error(json.error);
+    data = json;
+    $('password').value = '';
+    show();
+  } catch (err) {
+    $('login-msg').textContent = err.message.startsWith('Unexpected') || err.message.includes('fetch')
+      ? 'Could not reach the register. Check your connection, or ask Letlotlo to update the Apps Script.' : err.message;
+  } finally { btn.disabled = false; btn.textContent = 'Open register'; }
+});
+
+const col = name => data.headers.indexOf(name);
+const get = (r, name) => (col(name) >= 0 ? r[col(name)] : '');
+
+function show() {
+  $('login').hidden = true; $('register').hidden = false;
+  $('title').textContent = `${data.org} · ${data.rows.length} member${data.rows.length === 1 ? '' : 's'}`;
+  const count = (h, v) => data.rows.filter(r => get(r, h).toLowerCase() === v).length;
+  const year = new Date().getFullYear();
+  const recent = data.rows.filter(r => { const d = new Date(get(r, 'Submitted')); return !isNaN(d) && Date.now() - d < 30 * 864e5; }).length;
+  $('stats').innerHTML = [
+    [data.rows.length, 'Members'], [count('Gender', 'male'), 'Male'], [count('Gender', 'female'), 'Female'],
+    [count('Water baptism', 'yes'), 'Baptised in water'], [recent, 'Joined in the last 30 days'],
+  ].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join('');
+  draw();
+}
+
+function draw() {
+  const q = $('q').value.trim().toLowerCase();
+  const rows = data.rows
+    .map((r, i) => ({ r, i }))
+    .filter(({ r }) => !q || r.join(' ').toLowerCase().includes(q))
+    .sort((a, b) => (get(a.r, 'Surname') + get(a.r, 'Name')).localeCompare(get(b.r, 'Surname') + get(b.r, 'Name')));
+  $('rows').innerHTML = rows.map(({ r }, n) => {
+    const phone = get(r, 'Contact number');
+    const tel = phone.replace(/[^\d+]/g, '');
+    const joined = get(r, 'Submitted').split(' ')[0];
+    return `<tr><td class="n">${n + 1}</td>
+      <td class="name">${esc(get(r, 'Name'))} ${esc(get(r, 'Surname'))}</td>
+      <td data-l="Phone">${tel ? `<a href="tel:${esc(tel)}">${esc(phone)}</a>` : ''}</td>
+      <td data-l="Village">${esc([get(r, 'Village'), get(r, 'City / Town')].filter(Boolean).join(', '))}</td>
+      <td data-l="Church">${esc(get(r, 'Local church'))}</td>
+      <td data-l="Joined">${esc(joined)}</td></tr>`;
+  }).join('') || '<tr><td colspan="6">No members match.</td></tr>';
+}
+$('q').addEventListener('input', draw);
+
+// Download every column as a CSV file that opens in Excel or Google Sheets.
+$('csv').addEventListener('click', () => {
+  const cell = v => { v = String(v ?? ''); if (/^[=+\-@]/.test(v) && !/^\+?\d[\d\s]*$/.test(v)) v = "'" + v; return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v; };
+  const lines = [data.headers, ...data.rows].map(r => r.map(cell).join(','));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${data.org.replace(/\s+/g, '-')}-members-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+$('logout').addEventListener('click', () => { data = null; $('rows').innerHTML = ''; $('register').hidden = true; $('login').hidden = false; $('q').value = ''; });
+</script>
+</body>
+</html>
