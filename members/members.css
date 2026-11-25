@@ -98,3 +98,6 @@ input[type="radio"], input[type="checkbox"] { width: 1.1rem; height: 1.1rem; acc
   .row.two, .row.three { grid-template-columns: 1fr; }
 }
 .hint { display: block; font-weight: 400; font-size: .85rem; color: var(--muted); }
+.admin-link { text-align: center; margin: 1.4rem 0 0; font-size: .9rem; }
+.admin-link a { color: var(--muted); text-decoration: underline; }
+.admin-link a:hover, .admin-link a:focus-visible { color: var(--navy); }

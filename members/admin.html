@@ -43,7 +43,7 @@
 </head>
 <body>
   <header class="band">
-    <a class="back" href="../">← Letlotlo Hlaoli</a>
+    <a class="back" id="back" href="../">← Back</a>
     <p class="eyebrow">Admin</p>
     <h1>Membership register</h1>
   </header>
@@ -92,6 +92,9 @@ const ENDPOINT = 'https://script.google.com/macros/s/AKfycbyVsEc6dDrrqkdCg95BF1i
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let data = null; // kept in this tab only; closing the tab forgets it
+const pre = new URLSearchParams(location.search).get('org');
+if (pre) $('back').href = pre + '.html';
+if (pre && $('org').querySelector(`option[value="${pre}"]`)) $('org').value = pre;
 
 $('login').addEventListener('submit', async e => {
   e.preventDefault();
